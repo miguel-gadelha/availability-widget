@@ -49,15 +49,23 @@ export class Database {
     if (!this.db) {
       throw new Error("Database is not connected.");
     }
-    return this.db.collection(collectionName);
+    try {
+      return this.db.collection(collectionName);
+    } catch (error) {
+      throw new Error(`Failed to get collection: ${error}`);
+    }
   }
 
   public async close(): Promise<void> {
     if (this.client) {
-      await this.client.close();
+      try {
+        await this.client.close();
 
-      this.client = undefined;
-      this.db = undefined;
+        this.client = undefined;
+        this.db = undefined;
+      } catch (error) {
+        throw new Error(`Failed to close the DB connection: ${error}`);
+      }
     }
   }
 }

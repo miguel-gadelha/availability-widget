@@ -1,4 +1,5 @@
 import { hash, compare } from "bcrypt";
+import { sign, Secret } from "jsonwebtoken";
 import { Database } from "../lib/db";
 import Validator from "../lib/validator";
 
@@ -85,36 +86,45 @@ export class Team {
     }
   }
 
+  static async login(email: string, password: string) {
+    if (!Validator.email(email)) {
+      throw new Error("Invalid email");
+    }
+
+    if (!Validator.password(password)) {
+      throw new Error("Invalid password");
+    }
+
+    const team = await this.findByEmail(email);
+
+    if (!team) {
+      throw new Error("Team does not exist in db");
+    }
+
+    const isValid = await compare(password, team.password);
+    if (isValid) {
+      return sign({ team }, process.env.JWT_SECRET as Secret);
+    }
+
+    throw new Error("Invalid credentials");
+  }
+
   static async findByEmail(email: string) {
     if (!Validator.email(email)) {
       throw new Error("Invalid email");
     }
 
     const db = Database.getInstance();
-    let isConnected = false;
 
-    try {
-      isConnected = await db.connect();
-    } catch (error) {
-      throw new Error(`Failed to connect to database: ${error}`);
-    }
+    const isConnected = await db.connect();
 
     if (!isConnected) {
       throw new Error("Failed to connect to database");
     }
 
-    let response;
-    try {
-      response = await db.getCollection("team").findOne({ email });
-    } catch (error) {
-      throw new Error(`Failed to get team: ${error}`);
-    } finally {
-      try {
-        await db.close();
-      } catch (error) {
-        throw new Error(`Failed to close to database: ${error}`);
-      }
-    }
+    const response = await db.getCollection("team").findOne({ email });
+
+    await db.close();
 
     return response;
   }
