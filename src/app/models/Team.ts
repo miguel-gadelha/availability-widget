@@ -37,24 +37,15 @@ export class Team {
       throw new Error(`Invalid Password`);
     }
 
-    try {
-      isConnected = await db.connect();
-    } catch (error) {
-      throw new Error(`Failed to connect to database: ${error}`);
-    }
+    isConnected = await db.connect();
 
     if (!isConnected) {
       throw new Error("Failed to connect to database");
     }
 
-    let emailNotUnique;
-    try {
-      emailNotUnique = await db
-        .getCollection("team")
-        .findOne({ email: this.email });
-    } catch (error) {
-      throw new Error(`Failed to search emails: ${error}`);
-    }
+    const emailNotUnique = await db
+      .getCollection("team")
+      .findOne({ email: this.email });
 
     if (emailNotUnique) {
       throw new Error("Email already exists");
@@ -66,24 +57,20 @@ export class Team {
         process.env.SALTROUNDS as string
       );
       this.password = hashedPassword;
-
-      const result = await db.getCollection("team").insertOne({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        teamMembers: this.teamMembers,
-      });
-
-      return result;
     } catch (error) {
-      throw new Error(`Failed to insert team: ${error}`);
-    } finally {
-      try {
-        await db.close();
-      } catch (error) {
-        throw new Error(`Failed to close to database: ${error}`);
-      }
+      throw new Error(`Failed to hash the password: ${error}`);
     }
+
+    const result = await db.getCollection("team").insertOne({
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      teamMembers: this.teamMembers,
+    });
+
+    await db.close();
+
+    return result;
   }
 
   static async login(email: string, password: string) {
