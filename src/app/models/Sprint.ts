@@ -45,6 +45,37 @@ export class SprintHandler {
     return result;
   }
 
+  public async edit(name: string, settings: Partial<Sprint>) {
+    const db = Database.getInstance();
+    let isConnected = false;
+    let availlability;
+
+    isConnected = await db.connect();
+
+    if (!isConnected) {
+      throw new Error("Failed to connect to database");
+    }
+
+    if (settings.members && settings.length) {
+      availlability = this.calculateAvailability(
+        settings.members,
+        settings.length
+      );
+    }
+
+    const result = await db.getCollection("sprints").updateOne(
+      { name },
+      {
+        settings,
+        availlability,
+      }
+    );
+
+    await db.close();
+
+    return result;
+  }
+
   public async create(sprint: Sprint) {
     if (await this.isNameExists(sprint.name)) {
       throw new Error("Name already exists in database");
@@ -58,7 +89,7 @@ export class SprintHandler {
     await this.save(sprint, availlability);
   }
 
-  public static async getSprintByName(name: string) {
+  public static async findByName(name: string) {
     const db = Database.getInstance();
     let isConnected = false;
 
