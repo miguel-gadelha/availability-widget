@@ -20,7 +20,7 @@ export class SprintHandler {
   }
 
   private async isNameExists(name: string): Promise<boolean> {
-    return !!SprintHandler.getSprintByName(name);
+    return !!SprintHandler.findByName(name);
   }
 
   private async save(sprint: Sprint, availlability: number) {

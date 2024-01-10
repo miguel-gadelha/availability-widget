@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   try {
-    const sprint = await SprintHandler.getSprintByName(name as string);
+    const sprint = await SprintHandler.findByName(name as string);
 
     if (!sprint) {
       return res.status(404).json({ error: "Sprint not found" });
