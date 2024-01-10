@@ -25,7 +25,7 @@ export class Team {
     }
   }
 
-  public async save(): Promise<void> {
+  public async save() {
     const db = Database.getInstance();
     let isConnected = false;
 
