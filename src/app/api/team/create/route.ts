@@ -1,4 +1,4 @@
-import { Team } from "../../../models/Team";
+import { Team } from "@/app/models/Team";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(

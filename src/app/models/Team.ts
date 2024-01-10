@@ -25,7 +25,7 @@ export class Team {
     }
   }
 
-  public async save() {
+  public async save(): Promise<void> {
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -73,7 +73,7 @@ export class Team {
     return result;
   }
 
-  static async login(email: string, password: string) {
+  static async login(email: string, password: string): Promise<string> {
     if (!Validator.email(email)) {
       throw new Error("Invalid email");
     }

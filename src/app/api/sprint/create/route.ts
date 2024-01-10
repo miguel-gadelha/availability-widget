@@ -1,4 +1,4 @@
-import { SprintHandler } from "../../../models/Sprint";
+import { SprintHandler } from "@/app/models/Sprint";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
