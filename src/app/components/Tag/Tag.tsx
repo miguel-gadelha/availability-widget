@@ -15,7 +15,7 @@ const Tag = (props: Props) => {
 
   return (
     <div
-      className={`flex justify-between items-center tag bg-slate-900 rounded-2xl text-white px-3 py-1 whitespace-nowrap ${props.className}`}
+      className={`flex justify-between w-fit items-center tag bg-slate-900 rounded-2xl text-white px-3 py-1 whitespace-nowrap ${props.className}`}
     >
       {String(props.children)}
       {props.dismissable && (
