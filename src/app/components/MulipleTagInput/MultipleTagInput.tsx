@@ -4,15 +4,14 @@ import { useRef, useState } from "react";
 import Tag from "../Tag/Tag";
 
 interface Props {
+  label?: string;
+  placeholder?: string;
   onTagsChange?: (tags: string[]) => void; // Optional prop for the callback
 }
 
 const MultipleTagInput = (props: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [tags, setTags] = useState<string[]>([
-    "Francisco Faria",
-    "Pedro Postas",
-  ]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const handleTagDismiss = (index: number) => {
     setTags((tags) => {
@@ -41,26 +40,41 @@ const MultipleTagInput = (props: Props) => {
   };
 
   return (
-    <div className="multiple-tag-input h-auto min-h-20 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
-      <div className="items-start w-full flex flex-wrap">
-        {tags.map((tag: string, i: number) => {
-          return (
-            <Tag
-              className={`${i === 0 ? "mr-1" : "mx-1"} mb-1`}
-              dismissable
-              onDismiss={() => handleTagDismiss(i)}
-              key={i}
-            >
-              {tag}
-            </Tag>
-          );
-        })}
-        <input
-          className="ml-1 h-7 flex-grow min-w-36"
-          ref={inputRef}
-          type="text"
-          onInput={handleInput}
-        />
+    <div className="multiple-tag-input">
+      {props.label && (
+        <label
+          id="multiple-tag-label"
+          className="text-sm font-medium leading-none block mb-2"
+        >
+          {props.label}
+        </label>
+      )}
+
+      <div className="h-auto min-h-20 px-2 py-3 rounded-md border border-input bg-transparent text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+        <div
+          className="items-start w-full flex flex-wrap"
+          aria-labelledby="multiple-tag-label"
+        >
+          {tags.map((tag: string, i: number) => {
+            return (
+              <Tag
+                className={`${i === 0 ? "mr-1" : "mx-1"} mb-1`}
+                dismissable
+                onDismiss={() => handleTagDismiss(i)}
+                key={i}
+              >
+                {tag}
+              </Tag>
+            );
+          })}
+          <input
+            className="ml-1 h-7 flex-grow min-w-36"
+            ref={inputRef}
+            type="text"
+            onInput={handleInput}
+            placeholder={tags.length === 0 ? props.placeholder : undefined}
+          />
+        </div>
       </div>
     </div>
   );
