@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Tag from "../Tag/Tag";
 
 interface Props {
+  className: string;
   label?: string;
   placeholder?: string;
   onTagsChange?: (tags: string[]) => void; // Optional prop for the callback
@@ -40,7 +41,7 @@ const MultipleTagInput = (props: Props) => {
   };
 
   return (
-    <div className="multiple-tag-input">
+    <div className={`multiple-tag-input ${props.className}`}>
       {props.label && (
         <label
           id="multiple-tag-label"
@@ -68,7 +69,7 @@ const MultipleTagInput = (props: Props) => {
             );
           })}
           <input
-            className="ml-1 h-7 flex-grow min-w-36"
+            className="ml-1 flex-grow min-w-36"
             ref={inputRef}
             type="text"
             onInput={handleInput}

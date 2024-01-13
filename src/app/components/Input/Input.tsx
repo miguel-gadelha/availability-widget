@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 interface Prop {
+  className: string;
   type: string;
   placeholder?: string;
   label?: string;
@@ -19,7 +20,7 @@ const Input = (props: Prop) => {
   };
 
   return (
-    <div className="input">
+    <div className={props.className}>
       {props.label && (
         <label
           htmlFor="text-input"
