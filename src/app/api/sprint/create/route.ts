@@ -1,10 +1,7 @@
 import { SprintHandler } from "@/app/models/Sprint";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
   const sprintHandler = new SprintHandler();
   const { name, length, members } = req.body;
 

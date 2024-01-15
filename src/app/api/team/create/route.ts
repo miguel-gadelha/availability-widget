@@ -1,10 +1,7 @@
 import { Team } from "@/app/models/Team";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
   const { name, password, email, teamMembers } = req.body;
 
   if (!name || !password || !email || !teamMembers || teamMembers.length < 1) {
