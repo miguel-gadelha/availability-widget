@@ -4,10 +4,11 @@ import Link from "next/link";
 import Input from "../Input/Input";
 import MultipleTagInput from "../MulipleTagInput/MultipleTagInput";
 import Card from "../ui/Card";
-import Button from "../ui/button";
+import Button from "../ui/Button";
 import { useState } from "react";
 import Validator from "@/app/lib/validator";
-import post from "axios";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const NAME_ERROR = "Your team needs a name with at least 3 characters. ";
 const EMAIL_ERROR = "You need to provide a valid email. ";
@@ -18,79 +19,86 @@ const GENERIC_ERROR =
   "Something went wrong with your sign in. Please try again in a few seconds";
 
 const TeamForm = () => {
-  const [invalidForm, setInvalidForm] = useState(true);
   const [invalidMessage, setInvalidMessage] = useState("");
+
   const [teamName, setTeamName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
 
-  const resetInvalid = () => {
-    setInvalidForm(false);
-    setInvalidMessage("");
-  };
+  const [invalidName, setInvalidName] = useState(true);
+  const [invalidEmail, setInvalidEmail] = useState(true);
+  const [invalidPassword, setInvalidPassword] = useState(true);
+  const [invalidTeam, setInvalidTeam] = useState(true);
+
+  const router = useRouter();
 
   const handleTeamNameChange = (value: string) => {
-    resetInvalid();
+    setInvalidMessage("");
 
-    if (value.length >= 3) {
+    if (value.length < 3) {
+      setInvalidName(true);
+    } else {
+      setInvalidName(false);
       setTeamName(value);
     }
   };
 
   const handleEmailChange = (value: string) => {
-    resetInvalid();
+    setInvalidMessage("");
 
-    if (value.length >= 3) {
+    if (!Validator.email(value)) {
+      setInvalidEmail(true);
+    } else {
+      setInvalidEmail(false);
       setEmail(value);
     }
   };
 
   const handlePasswordChange = (value: string) => {
-    resetInvalid();
+    setInvalidMessage("");
 
-    if (value.length >= 8) {
+    if (!Validator.password(value)) {
+      setInvalidPassword(true);
+    } else {
+      setInvalidPassword(false);
       setPassword(value);
     }
   };
 
   const handleTeamMembersChange = (tags: string[]) => {
-    resetInvalid();
-    setTeamMembers(tags);
+    setInvalidMessage("");
+
+    if (tags.length < 1) {
+      setInvalidTeam(true);
+    } else {
+      setInvalidTeam(false);
+      setTeamMembers(tags);
+    }
   };
 
   const handleSubmit = () => {
-    let formIsValid = true;
-
-    if (teamName.length < 3) {
-      formIsValid = false;
-      setInvalidMessage((message: string) => {
-        return message + NAME_ERROR;
-      });
+    if (invalidName) {
+      setInvalidMessage((message: string) => message + NAME_ERROR);
+    }
+    if (invalidEmail) {
+      setInvalidMessage((message: string) => message + EMAIL_ERROR);
+    }
+    if (invalidPassword) {
+      setInvalidMessage((message: string) => message + PASSWORD_ERROR);
+    }
+    if (invalidTeam) {
+      setInvalidMessage((message: string) => message + TEAM_ERROR);
     }
 
-    if (!Validator.email(email)) {
-      formIsValid = false;
-      setInvalidMessage((message: string) => {
-        return message + EMAIL_ERROR;
-      });
-    }
-
-    if (!Validator.password(password)) {
-      formIsValid = false;
-      setInvalidMessage((message: string) => {
-        return message + PASSWORD_ERROR;
-      });
-    }
-
-    if (teamMembers.length < 1) {
-      formIsValid = false;
-      setInvalidMessage((message: string) => {
-        return message + TEAM_ERROR;
-      });
-    }
-
-    if (!formIsValid) {
+    if (
+      invalidEmail ||
+      invalidMessage ||
+      invalidName ||
+      invalidPassword ||
+      invalidPassword ||
+      invalidTeam
+    ) {
       return;
     }
 
@@ -103,14 +111,20 @@ const TeamForm = () => {
 
     console.log(request_body);
 
-    post({ url: "/api/team/create", data: request_body })
+    axios
+      .post("/api/team/create", request_body, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
       .then((respose) => {
         if (respose.status !== 200) {
           setInvalidMessage(GENERIC_ERROR);
           return;
         }
 
-        // redirect to login
+        router.push("/login");
       })
       .catch(() => {
         setInvalidMessage(GENERIC_ERROR);
@@ -126,21 +140,21 @@ const TeamForm = () => {
       </p>
 
       <Input
-        className="mb-4"
+        className={`mb-4 ${invalidName ? "border-red-500" : ""}`}
         type="text"
         placeholder="Add your team name"
         label="Team Name"
         onInputChange={handleTeamNameChange}
       ></Input>
       <Input
-        className="mb-4"
+        className={`mb-4 ${invalidEmail ? "border-red-500" : ""}`}
         type="email"
         placeholder="Add your team email"
         label="Email"
         onInputChange={handleEmailChange}
       ></Input>
       <Input
-        className="mb-4"
+        className={`mb-4 ${invalidPassword ? "border-red-500" : ""}`}
         type="password"
         placeholder="Add your password"
         label="Password"
@@ -149,16 +163,11 @@ const TeamForm = () => {
       <MultipleTagInput
         label="Team Members"
         placeholder="Insert names separated by a comma ( , )"
-        className="mb-4"
+        className={`mb-4 ${invalidTeam ? "border-red-500" : ""}`}
         onTagsChange={handleTeamMembersChange}
       ></MultipleTagInput>
 
-      <Button
-        type="button"
-        className="w-full"
-        onClick={handleSubmit}
-        disabled={invalidForm}
-      >
+      <Button type="button" className="w-full" onClick={handleSubmit}>
         Sign Up
       </Button>
 

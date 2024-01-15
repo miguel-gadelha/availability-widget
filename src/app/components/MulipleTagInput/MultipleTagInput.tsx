@@ -28,10 +28,11 @@ const MultipleTagInput = (props: Props) => {
     if (inputValue?.includes(",")) {
       if (inputValue.length > 1) {
         setTags((tags: string[]) => {
-          return [...tags, inputValue.slice(0, -1)];
-        });
+          const newState = [...tags, inputValue.slice(0, -1)];
+          props.onTagsChange?.(newState);
 
-        props.onTagsChange?.(tags);
+          return newState;
+        });
       }
 
       if (inputRef.current) {
