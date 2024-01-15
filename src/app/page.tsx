@@ -1,5 +1,5 @@
-import MultipleTagInput from "./components/MulipleTagInput/MultipleTagInput";
+import TeamForm from "./components/TeamForm/TeamForm";
 
 export default function Page() {
-  return <MultipleTagInput></MultipleTagInput>;
+  return <TeamForm></TeamForm>;
 }

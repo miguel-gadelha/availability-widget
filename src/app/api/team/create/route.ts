@@ -1,19 +1,23 @@
 import { Team } from "@/app/models/Team";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { name, password, email, teamMembers } = req.body;
+export async function POST(req: NextRequest) {
+  const { name, password, email, teamMembers } = await req.json();
+
+  Response.json({ something: true });
 
   if (!name || !password || !email || !teamMembers || teamMembers.length < 1) {
-    return res.status(400).json({ error: "Bad Request" });
+    return Response.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
     const team = new Team(name, password, email, teamMembers);
     const newTeam = await team.save();
 
-    return res.status(201).json(newTeam);
+    return Response.json(newTeam, { status: 201 });
   } catch (error) {
-    return res.status(500).json({ error });
+    console.error(error);
+
+    return Response.json(error, { status: 500 });
   }
 }
