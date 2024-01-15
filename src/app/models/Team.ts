@@ -52,10 +52,7 @@ export class Team {
     }
 
     try {
-      const hashedPassword = await hash(
-        this.password,
-        process.env.SALTROUNDS as string
-      );
+      const hashedPassword = await hash(this.password, 10);
       this.password = hashedPassword;
     } catch (error) {
       throw new Error(`Failed to hash the password: ${error}`);
