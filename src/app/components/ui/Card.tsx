@@ -8,7 +8,7 @@ interface Props {
 const Card = (props: Props) => {
   return (
     <div
-      className={`rounded-lg border bg-card text-card-foreground shadow-sm p-6 ${props.className}`}
+      className={`bg-white rounded-lg border bg-card text-card-foreground shadow-sm p-6 ${props.className}`}
     >
       {props.children}
     </div>
