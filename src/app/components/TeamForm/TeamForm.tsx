@@ -177,7 +177,7 @@ const TeamForm = () => {
 
       <p className="w-full text-center mt-5 text-sm font-normal leading-5 text-slate-600">
         If you already have an account{" "}
-        <Link className="font-bold underline" href={"/login"}>
+        <Link className="font-bold underline" href={"/auth/login"}>
           Log in
         </Link>
       </p>
