@@ -1,5 +1,5 @@
 import { Team } from "@/app/models/Team";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { name, password, email, teamMembers } = await req.json();

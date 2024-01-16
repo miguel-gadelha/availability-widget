@@ -109,8 +109,6 @@ const TeamForm = () => {
       teamMembers,
     };
 
-    console.log(request_body);
-
     axios
       .post("/api/team/create", request_body, {
         headers: {
@@ -118,15 +116,17 @@ const TeamForm = () => {
           Accept: "application/json",
         },
       })
-      .then((respose) => {
-        if (respose.status !== 200) {
+      .then((response) => {
+        if (response.status !== 201) {
+          console.error(response);
           setInvalidMessage(GENERIC_ERROR);
           return;
         }
 
         router.push("/login");
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         setInvalidMessage(GENERIC_ERROR);
       });
   };
