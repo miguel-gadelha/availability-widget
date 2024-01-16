@@ -1,18 +1,20 @@
 import { Team } from "@/app/models/Team";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { email, password } = req.body;
+export async function POST(req: NextRequest) {
+  const { email, password } = await req.json();
 
   if (!email || !password) {
-    res.status(400).json({ error: "Bad Request" });
+    return Response.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
     const token = await Team.login(email, password);
 
-    return res.status(200).json({ token });
+    return Response.json({ token }, { status: 201 });
   } catch (error) {
-    return res.status(500).json({ error });
+    console.error(error);
+
+    return Response.json({ status: 500 });
   }
 }
