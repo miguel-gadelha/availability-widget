@@ -19,14 +19,14 @@ const DaysOutInput = (props: Props) => {
           {props.label}
         </label>
       )}
-      <div className="member-inputs">
+      <div className="member-inputs mb-5">
         {props.members.map((member: string, i: number) => {
           return (
             <div
               className="input-item w-full flex justify-between items-center gap-3 font-normal text-base leading-none mb-2"
               key={`member-${i}`}
             >
-              <span className="text-slate-900 text-sm not-italic font-medium leading-[100%]">
+              <span className="text-slate-600 text-sm not-italic font-medium leading-[100%]">
                 {member}
               </span>
               <input

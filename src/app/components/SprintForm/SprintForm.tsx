@@ -10,8 +10,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
 
-const NAME_ERROR = "You must provide a unique name with more than 3 characters";
-const LENGTH_ERROR = "Sprint length mas be at least 1 day";
+const NAME_ERROR =
+  "You must provide a unique name with more than 3 characters. ";
+const LENGTH_ERROR = "Sprint length must be at least 1 day. ";
 const GENERIC_ERROR =
   "Something went wrong creating your sprint. Please try again in a few seconds.";
 
