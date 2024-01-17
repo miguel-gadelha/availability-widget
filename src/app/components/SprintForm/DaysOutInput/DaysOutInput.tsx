@@ -1,4 +1,8 @@
-export type MemberVacations = { member: string; days: number };
+"use client";
+
+import { useState } from "react";
+
+export type MemberVacations = { name: string; days: number };
 
 interface Props {
   members: string[];
@@ -8,6 +12,28 @@ interface Props {
 
 const DaysOutInput = (props: Props) => {
   const id = `${props.label?.split(" ")[0].toLowerCase()}-input`;
+
+  const defaultState = props.members.map((name: string) => ({
+    name,
+    days: 0,
+  }));
+
+  const [daysOut, setDaysOut] = useState(defaultState);
+
+  const handleInputChange = (name: string, value: string) => {
+    setDaysOut((state: MemberVacations[]) => {
+      const newState = [...state];
+      const index = newState.findIndex((vacation) => vacation.name === name);
+
+      if (index !== -1) {
+        newState[index] = { name, days: Number(value) };
+      }
+
+      props.onInputChange(newState);
+
+      return newState;
+    });
+  };
 
   return (
     <div className="days-out-input">
@@ -35,7 +61,8 @@ const DaysOutInput = (props: Props) => {
                 min={0}
                 max={365}
                 step={5}
-                defaultValue={0}
+                placeholder={"0"}
+                onChange={(e) => handleInputChange(member, e.target.value)}
               ></input>
             </div>
           );
