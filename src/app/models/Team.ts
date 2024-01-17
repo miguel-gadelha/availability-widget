@@ -2,6 +2,7 @@ import { hash, compare } from "bcrypt";
 import { sign, Secret } from "jsonwebtoken";
 import { Database } from "../lib/db";
 import Validator from "../lib/validator";
+import { ObjectId } from "mongodb";
 
 export class Team {
   name: string;
@@ -73,7 +74,7 @@ export class Team {
     return result;
   }
 
-  static async login(email: string, password: string): Promise<string> {
+  public static async login(email: string, password: string): Promise<string> {
     if (!Validator.email(email)) {
       throw new Error("Invalid email");
     }
@@ -96,11 +97,7 @@ export class Team {
     throw new Error("Invalid credentials");
   }
 
-  static async findByEmail(email: string) {
-    if (!Validator.email(email)) {
-      throw new Error("Invalid email");
-    }
-
+  protected static async findTeam(query: object) {
     const db = Database.getInstance();
 
     const isConnected = await db.connect();
@@ -109,10 +106,22 @@ export class Team {
       throw new Error("Failed to connect to database");
     }
 
-    const response = await db.getCollection("team").findOne({ email });
+    const response = await db.getCollection("team").findOne({ ...query });
 
     await db.close();
 
     return response;
+  }
+
+  static async findByEmail(email: string) {
+    if (!Validator.email(email)) {
+      throw new Error("Invalid email");
+    }
+
+    return await this.findTeam({ email: email });
+  }
+
+  static async findById(teamId: ObjectId) {
+    return await this.findTeam({ _id: teamId });
   }
 }

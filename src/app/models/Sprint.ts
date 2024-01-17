@@ -1,4 +1,6 @@
+import { ObjectId } from "mongodb";
 import { Database } from "../lib/db";
+import { Team } from "./Team";
 
 interface Sprint {
   name: string;
@@ -19,11 +21,11 @@ export class SprintHandler {
     return (length * members.length) / (length * members.length - totalDaysOut);
   }
 
-  private async isNameExists(name: string): Promise<boolean> {
-    return !!SprintHandler.findByName(name);
+  private async isNameExists(teamId: ObjectId, name: string): Promise<boolean> {
+    return !!SprintHandler.findByName(teamId, name);
   }
 
-  private async save(sprint: Sprint, availlability: number) {
+  private async save(teamId: ObjectId, sprint: Sprint, availlability: number) {
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -38,6 +40,7 @@ export class SprintHandler {
       length: sprint.length,
       members: sprint.members,
       availlability: availlability,
+      teamId,
     });
 
     await db.close();
@@ -45,7 +48,7 @@ export class SprintHandler {
     return result;
   }
 
-  public async edit(name: string, settings: Partial<Sprint>) {
+  public async edit(teamId: ObjectId, name: string, settings: Partial<Sprint>) {
     const db = Database.getInstance();
     let isConnected = false;
     let availlability;
@@ -76,9 +79,15 @@ export class SprintHandler {
     return result;
   }
 
-  public async create(sprint: Sprint) {
-    if (await this.isNameExists(sprint.name)) {
+  public async create(teamId: ObjectId, sprint: Sprint) {
+    if (await this.isNameExists(teamId, sprint.name)) {
       throw new Error("Name already exists in database");
+    }
+
+    const team = await Team.findById(teamId);
+
+    if (!team) {
+      throw new Error("Team not found in database");
     }
 
     const availlability = this.calculateAvailability(
@@ -86,10 +95,14 @@ export class SprintHandler {
       sprint.length
     );
 
-    await this.save(sprint, availlability);
+    await this.save(sprint, availlability, team._id);
   }
 
-  public static async findByName(name: string) {
+  protected static async findSprints(teamId: ObjectId, query?: object) {
+    if (!teamId) {
+      return;
+    }
+
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -99,10 +112,26 @@ export class SprintHandler {
       throw new Error("Failed to connect to database");
     }
 
-    const sprint = await db.getCollection("sprints").findOne({ name });
+    let result;
+
+    if (query) {
+      result = await db
+        .getCollection("sprints")
+        .findOne({ teamId, ...{ query } });
+    } else {
+      result = await db.getCollection("sprints").find({ teamId }).toArray();
+    }
 
     await db.close();
 
-    return sprint;
+    return result;
+  }
+
+  public static async findByName(teamId: ObjectId, name: string) {
+    return await this.findSprints(teamId, { name: name });
+  }
+
+  public static async findByTeamId(teamId: ObjectId) {
+    return await this.findSprints(teamId);
   }
 }
