@@ -1,19 +1,22 @@
 import { SprintHandler } from "@/app/models/Sprint";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { ObjectId } from "mongodb";
+import { NextRequest } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
   const sprintHandler = new SprintHandler();
-  const { name, length, members } = req.body;
+  const { name, length, members } = await req.json();
 
   if (!name || !length || !members || members.length < 1) {
-    return res.status(400).json({ error: "Bad Request" });
+    return Response.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
-    await sprintHandler.create({ name, length, members });
+    const teamId = new ObjectId("65a6ef0f099c1352d7a334aa");
+    await sprintHandler.create(teamId, { name, length, members });
 
-    return res.status(201);
+    return Response.json({}, { status: 201 });
   } catch (error) {
-    return res.status(500).json({ error });
+    console.error(error);
+    return Response.json({ status: 500 });
   }
 }

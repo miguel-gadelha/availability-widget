@@ -5,7 +5,7 @@ import { Team } from "./Team";
 interface Sprint {
   name: string;
   length: number;
-  members: [{ name: string; daysOut: number }];
+  members: [{ name: string; days: number }];
 }
 
 export class SprintHandler {
@@ -14,18 +14,21 @@ export class SprintHandler {
     length: number
   ): number {
     const totalDaysOut = members.reduce(
-      (total, member) => total + member.daysOut,
+      (total, member) => total + member.days,
       0
     );
 
-    return (length * members.length) / (length * members.length - totalDaysOut);
+    const totalSprintDays = length * members.length;
+    const actualSprintDays = totalSprintDays - totalDaysOut;
+
+    return (actualSprintDays * 100) / totalSprintDays;
   }
 
   private async isNameExists(teamId: ObjectId, name: string): Promise<boolean> {
-    return !!SprintHandler.findByName(teamId, name);
+    return Boolean(await SprintHandler.findByName(teamId, name));
   }
 
-  private async save(teamId: ObjectId, sprint: Sprint, availlability: number) {
+  private async save(teamId: ObjectId, sprint: Sprint, availlability: string) {
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -95,7 +98,7 @@ export class SprintHandler {
       sprint.length
     );
 
-    await this.save(sprint, availlability, team._id);
+    await this.save(team._id, sprint, availlability.toFixed(2));
   }
 
   protected static async findSprints(teamId: ObjectId, query?: object) {
