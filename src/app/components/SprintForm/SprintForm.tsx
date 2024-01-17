@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useState } from "react";
-import Validator from "@/app/lib/validator";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
@@ -21,6 +19,7 @@ const SprintForm = () => {
 
   const [name, setName] = useState("");
   const [length, setLength] = useState(15);
+  const [members, setMembers] = useState<MemberVacations[]>([]);
 
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
@@ -30,7 +29,7 @@ const SprintForm = () => {
   const handleNameChange = (value: string) => {
     setInvalidMessage("");
 
-    if (!Validator.email(value)) {
+    if (value.length < 3) {
       setInvalidName(true);
     } else {
       setInvalidName(false);
@@ -41,7 +40,7 @@ const SprintForm = () => {
   const handleLengthChange = (value: string) => {
     setInvalidMessage("");
 
-    if (Number(value) > 0) {
+    if (Number(value) < 1) {
       setInvalidLength(true);
     } else {
       setInvalidLength(false);
@@ -49,7 +48,10 @@ const SprintForm = () => {
     }
   };
 
-  const handleDaysOutChange = (value: MemberVacations[]) => {};
+  const handleDaysOutChange = (value: MemberVacations[]) => {
+    setInvalidMessage("");
+    setMembers(value);
+  };
 
   const handleSubmit = () => {
     if (invalidName) {
@@ -59,13 +61,14 @@ const SprintForm = () => {
       setInvalidMessage((message: string) => message + LENGTH_ERROR);
     }
 
-    if (invalidName || invalidMessage || invalidLength || invalidLength) {
+    if (invalidName || invalidLength) {
       return;
     }
 
     const request_body = {
       name,
       length,
+      members,
     };
 
     axios
