@@ -4,17 +4,19 @@ import { Database } from "../lib/db";
 import Validator from "../lib/validator";
 import { ObjectId } from "mongodb";
 
-export class Team {
+export interface TeamSettings {
   name: string;
-  password: string;
   email: string;
   teamMembers: string[];
+  teamId: ObjectId;
+}
 
+export class Team {
   constructor(
-    name: string,
-    password: string,
-    email: string,
-    teamMembers: string[]
+    private name: TeamSettings["name"],
+    private password: string,
+    private email: TeamSettings["email"],
+    private teamMembers: string[]
   ) {
     this.name = name;
     this.password = password;
@@ -113,7 +115,7 @@ export class Team {
     return response;
   }
 
-  static async findByEmail(email: string) {
+  public static async findByEmail(email: string) {
     if (!Validator.email(email)) {
       throw new Error("Invalid email");
     }
@@ -121,7 +123,7 @@ export class Team {
     return await this.findTeam({ email: email });
   }
 
-  static async findById(teamId: ObjectId) {
+  public static async findById(teamId: ObjectId) {
     return await this.findTeam({ _id: teamId });
   }
 }
