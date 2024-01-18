@@ -3,10 +3,11 @@
 import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
+import { TeamContext } from "@/app/context/TeamContext";
 
 const NAME_ERROR =
   "You must provide a unique name with more than 3 characters. ";
@@ -16,15 +17,24 @@ const GENERIC_ERROR =
 
 const SprintForm = () => {
   const [invalidMessage, setInvalidMessage] = useState("");
-
   const [name, setName] = useState("");
   const [length, setLength] = useState(15);
   const [members, setMembers] = useState<MemberVacations[]>([]);
-
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
 
   const router = useRouter();
+  const context = useContext(TeamContext);
+
+  if (context === null) {
+    return;
+  }
+
+  // if (context === false) {
+  //   router.push("auth/login");
+  // }
+
+  console.log(context);
 
   const handleNameChange = (value: string) => {
     setInvalidMessage("");
