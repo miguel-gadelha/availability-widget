@@ -67,6 +67,7 @@ const LoginForm = () => {
 
     axios
       .post("/api/login", request_body, {
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

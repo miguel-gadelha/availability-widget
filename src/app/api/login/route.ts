@@ -10,8 +10,15 @@ export async function POST(req: NextRequest) {
 
   try {
     const token = await Team.login(email, password);
+    const expiryDate = new Date();
 
-    return Response.json({ token }, { status: 201 });
+    expiryDate.setDate(expiryDate.getDate() + 1);
+    const cookie = `auth=${token}; Path=/; Expires=${expiryDate.toUTCString()}; HttpOnly`;
+
+    return Response.json(null, {
+      status: 201,
+      headers: { "Set-Cookie": cookie },
+    });
   } catch (error) {
     console.error(error);
 
