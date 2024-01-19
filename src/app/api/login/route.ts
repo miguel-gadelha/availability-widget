@@ -1,11 +1,11 @@
 import { Team } from "@/app/models/Team";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
-    return Response.json({ error: "Bad Request" }, { status: 400 });
+    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
@@ -13,15 +13,15 @@ export async function POST(req: NextRequest) {
     const expiryDate = new Date();
 
     expiryDate.setDate(expiryDate.getDate() + 1);
-    const cookie = `auth=${token}; Path=/; Expires=${expiryDate.toUTCString()}; HttpOnly`;
+    const cookie = `auth=${token}; Path=/; Expires=${expiryDate.toUTCString()}; HttpOnly;`;
 
-    return Response.json(null, {
+    return NextResponse.json(null, {
       status: 201,
       headers: { "Set-Cookie": cookie },
     });
   } catch (error) {
     console.error(error);
 
-    return Response.json({ status: 500 });
+    return NextResponse.json({ status: 500 });
   }
 }
