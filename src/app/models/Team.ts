@@ -1,14 +1,14 @@
 import { hash, compare } from "bcrypt";
 import { sign, Secret } from "jsonwebtoken";
 import { Database } from "../lib/db";
-import Validator from "../lib/validator";
+import Validator from "../lib/utils/validator";
 import { ObjectId } from "mongodb";
 
 export interface TeamSettings {
   name: string;
   email: string;
   teamMembers: string[];
-  teamId: ObjectId;
+  teamId: string;
 }
 
 export class Team {
@@ -108,7 +108,11 @@ export class Team {
       throw new Error("Failed to connect to database");
     }
 
+    console.log("query", query);
+
     const response = await db.getCollection("team").findOne({ ...query });
+
+    console.log("response", response);
 
     await db.close();
 
@@ -123,7 +127,7 @@ export class Team {
     return await this.findTeam({ email: email });
   }
 
-  public static async findById(teamId: ObjectId) {
-    return await this.findTeam({ _id: teamId });
+  public static async findById(teamId: string) {
+    return await this.findTeam({ _id: new ObjectId(teamId) });
   }
 }

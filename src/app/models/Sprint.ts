@@ -24,11 +24,11 @@ export class SprintHandler {
     return (actualSprintDays * 100) / totalSprintDays;
   }
 
-  private async isNameExists(teamId: ObjectId, name: string): Promise<boolean> {
+  private async isNameExists(teamId: string, name: string): Promise<boolean> {
     return Boolean(await SprintHandler.findByName(teamId, name));
   }
 
-  private async save(teamId: ObjectId, sprint: Sprint, availlability: string) {
+  private async save(teamId: string, sprint: Sprint, availlability: string) {
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -51,7 +51,7 @@ export class SprintHandler {
     return result;
   }
 
-  public async edit(teamId: ObjectId, name: string, settings: Partial<Sprint>) {
+  public async edit(teamId: string, name: string, settings: Partial<Sprint>) {
     const db = Database.getInstance();
     let isConnected = false;
     let availlability;
@@ -70,7 +70,7 @@ export class SprintHandler {
     }
 
     const result = await db.getCollection("sprints").updateOne(
-      { name },
+      { name, teamId },
       {
         settings,
         availlability,
@@ -82,7 +82,7 @@ export class SprintHandler {
     return result;
   }
 
-  public async create(teamId: ObjectId, sprint: Sprint) {
+  public async create(teamId: string, sprint: Sprint) {
     if (await this.isNameExists(teamId, sprint.name)) {
       throw new Error("Name already exists in database");
     }
@@ -98,10 +98,10 @@ export class SprintHandler {
       sprint.length
     );
 
-    await this.save(team._id, sprint, availlability.toFixed(2));
+    await this.save(teamId, sprint, availlability.toFixed(2));
   }
 
-  protected static async findSprints(teamId: ObjectId, query?: object) {
+  protected static async findSprints(teamId: string, query?: object) {
     if (!teamId) {
       return;
     }
@@ -120,7 +120,7 @@ export class SprintHandler {
     if (query) {
       result = await db
         .getCollection("sprints")
-        .findOne({ teamId, ...{ query } });
+        .findOne({ _id: new ObjectId(teamId), ...{ query } });
     } else {
       result = await db.getCollection("sprints").find({ teamId }).toArray();
     }
@@ -130,11 +130,11 @@ export class SprintHandler {
     return result;
   }
 
-  public static async findByName(teamId: ObjectId, name: string) {
+  public static async findByName(teamId: string, name: string) {
     return await this.findSprints(teamId, { name: name });
   }
 
-  public static async findByTeamId(teamId: ObjectId) {
+  public static async findByTeamId(teamId: string) {
     return await this.findSprints(teamId);
   }
 }
