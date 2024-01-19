@@ -6,8 +6,6 @@ export default class TeamUtils {
     try {
       const jwt = Cookies.get("auth");
 
-      // TODO: token not availlable here
-
       if (!jwt) {
         return null;
       }
