@@ -1,21 +1,25 @@
+import { withAuth } from "@/app/lib/auth/withAuth";
 import { SprintHandler } from "@/app/models/Sprint";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { TeamSettings } from "@/app/models/Team";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { name } = req.query;
-  const settings = req.body;
+export async function POST(req: NextRequest) {
+  await withAuth(req, async (team: TeamSettings) => {
+    const settings = await req.json();
+    const name = new URL(req.url).searchParams.get("name");
 
-  if (Object.keys(settings).length < 1 || !name) {
-    res.status(400).json({ error: "Bad Request" });
-  }
+    if (Object.keys(settings).length < 1 || !name || !team) {
+      return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+    }
 
-  try {
-    const sprintHandler = new SprintHandler();
+    try {
+      const sprintHandler = new SprintHandler();
 
-    await sprintHandler.edit(name as string, settings);
+      await sprintHandler.edit(team.teamId, name as string, settings);
 
-    return res.status(200);
-  } catch (error) {
-    return res.status(500).json({ error });
-  }
+      return NextResponse.json(null, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
+  });
 }
