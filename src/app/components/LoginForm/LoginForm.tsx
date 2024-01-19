@@ -5,7 +5,7 @@ import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useState } from "react";
-import Validator from "@/app/lib/validator";
+import Validator from "@/app/lib/utils/validator";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
