@@ -13,15 +13,18 @@ const NAME_ERROR =
   "You must provide a unique name with more than 3 characters. ";
 const LENGTH_ERROR = "Sprint length must be at least 1 day. ";
 const GENERIC_ERROR =
-  "Something went wrong creating your sprint. Please try again in a few seconds.";
+  "Something went wrong creating your sprint. Please try again in a few seconds. ";
+const DAYS_OUT_ERROR =
+  "The team members cannot be out for more than the length of the sprint. ";
 
 const SprintForm = () => {
   const [invalidMessage, setInvalidMessage] = useState("");
   const [name, setName] = useState("");
-  const [length, setLength] = useState(15);
+  const [length, setLength] = useState(null);
   const [members, setMembers] = useState<MemberVacations[]>([]);
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
+  const [invalidDaysOut, setInvalidDaysOut] = useState(true);
 
   const router = useRouter();
   const context = useContext(TeamContext);
@@ -54,6 +57,16 @@ const SprintForm = () => {
 
   const handleDaysOutChange = (value: MemberVacations[]) => {
     setInvalidMessage("");
+
+    if (
+      length &&
+      value.some((memberVacation: MemberVacations) => {
+        return memberVacation.days > length;
+      })
+    ) {
+      setInvalidDaysOut(true);
+    }
+
     setMembers(value);
   };
 
@@ -65,7 +78,11 @@ const SprintForm = () => {
       setInvalidMessage((message: string) => message + LENGTH_ERROR);
     }
 
-    if (invalidName || invalidLength) {
+    if (invalidDaysOut) {
+      setInvalidMessage((message: string) => message + DAYS_OUT_ERROR);
+    }
+
+    if (invalidName || invalidLength || invalidDaysOut) {
       return;
     }
 
