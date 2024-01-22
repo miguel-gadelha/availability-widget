@@ -5,10 +5,10 @@ import Validator from "../lib/utils/validator";
 import { ObjectId } from "mongodb";
 
 export interface TeamSettings {
+  _id: string;
   name: string;
   email: string;
   teamMembers: string[];
-  teamId: string;
 }
 
 export class Team {
@@ -108,11 +108,7 @@ export class Team {
       throw new Error("Failed to connect to database");
     }
 
-    console.log("query", query);
-
     const response = await db.getCollection("team").findOne({ ...query });
-
-    console.log("response", response);
 
     await db.close();
 

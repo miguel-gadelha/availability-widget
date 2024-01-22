@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { TeamSettings } from "../models/Team";
-import TeamUtils from "../lib/TeamUtils";
+import TeamUtils from "../lib/utils/TeamUtils";
 
 export const TeamContext =
   createContext<Partial<TeamSettings | null | false>>(null);
@@ -13,11 +13,14 @@ const TeamContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const currentTeam = TeamUtils.getCurrentTeam();
 
-    console.log(currentTeam);
-    if (!currentTeam) {
-      setTeam(false);
+    if (
+      currentTeam &&
+      typeof currentTeam === "object" &&
+      "team" in currentTeam
+    ) {
+      setTeam(currentTeam.team as TeamSettings);
     } else {
-      setTeam(currentTeam as TeamSettings);
+      setTeam(false);
     }
   }, []);
 

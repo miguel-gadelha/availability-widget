@@ -26,15 +26,9 @@ const SprintForm = () => {
   const router = useRouter();
   const context = useContext(TeamContext);
 
-  if (context === null) {
+  if (!context) {
     return;
   }
-
-  // if (context === false) {
-  //   router.push("auth/login");
-  // }
-
-  console.log(context);
 
   const handleNameChange = (value: string) => {
     setInvalidMessage("");
@@ -125,14 +119,7 @@ const SprintForm = () => {
       ></Input>
 
       <DaysOutInput
-        members={[
-          "Nadine Soares",
-          "Joana Maiscedo",
-          "Fabio Caralho",
-          "Andre Mémé",
-          "Inês junker",
-          "Vera Vernandes",
-        ]}
+        members={context.teamMembers as string[]}
         label="Team Member's Days Out"
         onInputChange={handleDaysOutChange}
       ></DaysOutInput>

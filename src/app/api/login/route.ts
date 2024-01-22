@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const expiryDate = new Date();
 
     expiryDate.setDate(expiryDate.getDate() + 1);
-    const cookie = `auth=${token}; Path=/; Expires=${expiryDate.toUTCString()}; HttpOnly;`;
+    const cookie = `auth=${token}; Path=/; Expires=${expiryDate.toUTCString()};`;
 
     return NextResponse.json(null, {
       status: 201,

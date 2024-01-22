@@ -13,9 +13,9 @@ export async function withAuth(
   }
 
   try {
-    const team = decode(auth.value) as TeamSettings;
+    const token = decode(auth.value) as Partial<{ team: TeamSettings }>;
 
-    return await next(team);
+    return await next(token.team as TeamSettings);
   } catch {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }

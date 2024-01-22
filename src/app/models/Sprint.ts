@@ -86,7 +86,6 @@ export class SprintHandler {
     if (await this.isNameExists(teamId, sprint.name)) {
       throw new Error("Name already exists in database");
     }
-
     const team = await Team.findById(teamId);
 
     if (!team) {

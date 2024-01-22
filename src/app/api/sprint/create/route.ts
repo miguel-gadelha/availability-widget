@@ -1,7 +1,6 @@
 import { withAuth } from "@/app/lib/auth/withAuth";
 import { SprintHandler } from "@/app/models/Sprint";
 import { TeamSettings } from "@/app/models/Team";
-import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -14,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      await sprintHandler.create(team.teamId, {
+      await sprintHandler.create(team._id, {
         name,
         length,
         members,
