@@ -17,7 +17,11 @@ const GENERIC_ERROR =
 const DAYS_OUT_ERROR =
   "The team members cannot be out for more than the length of the sprint. ";
 
-const SprintForm = () => {
+interface Props {
+  onSubmit: () => void;
+}
+
+const SprintForm = (props: Props) => {
   const [invalidMessage, setInvalidMessage] = useState("");
   const [name, setName] = useState("");
   const [length, setLength] = useState(null);
@@ -106,7 +110,7 @@ const SprintForm = () => {
           return;
         }
 
-        router.push("/manage");
+        props.onSubmit();
       })
       .catch((error) => {
         console.error(error);
