@@ -3,9 +3,9 @@ import { ReactNode } from "react";
 interface Props {
   className?: string;
   type: HTMLButtonElement["type"];
-  children: ReactNode;
+  children?: ReactNode;
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 const Button = (props: Props) => {
   return (
@@ -15,7 +15,7 @@ const Button = (props: Props) => {
       onClick={props.onClick}
       disabled={props.disabled}
     >
-      {String(props.children)}
+      {props.children}
     </button>
   );
 };

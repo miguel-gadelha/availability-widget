@@ -24,7 +24,7 @@ interface Props {
 const SprintForm = (props: Props) => {
   const [invalidMessage, setInvalidMessage] = useState("");
   const [name, setName] = useState("");
-  const [length, setLength] = useState(null);
+  const [length, setLength] = useState<number | null>(null);
   const [members, setMembers] = useState<MemberVacations[]>([]);
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);

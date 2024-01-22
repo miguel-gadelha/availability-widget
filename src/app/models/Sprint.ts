@@ -1,12 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Database } from "../lib/db";
 import { Team } from "./Team";
-
-interface Sprint {
-  name: string;
-  length: number;
-  members: [{ name: string; days: number }];
-}
+import { Sprint } from "@/types";
 
 export class SprintHandler {
   private calculateAvailability(
