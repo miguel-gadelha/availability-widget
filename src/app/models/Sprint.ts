@@ -23,7 +23,7 @@ export class SprintHandler {
     return Boolean(await SprintHandler.findByName(teamId, name));
   }
 
-  private async save(teamId: string, sprint: Sprint, availlability: string) {
+  private async save(teamId: string, sprint: Sprint, availability: string) {
     const db = Database.getInstance();
     let isConnected = false;
 
@@ -37,7 +37,7 @@ export class SprintHandler {
       name: sprint.name,
       length: sprint.length,
       members: sprint.members,
-      availlability: availlability,
+      availability: availability,
       teamId,
     });
 
@@ -49,7 +49,7 @@ export class SprintHandler {
   public async edit(teamId: string, name: string, settings: Partial<Sprint>) {
     const db = Database.getInstance();
     let isConnected = false;
-    let availlability;
+    let availability;
 
     isConnected = await db.connect();
 
@@ -58,7 +58,7 @@ export class SprintHandler {
     }
 
     if (settings.members && settings.length) {
-      availlability = this.calculateAvailability(
+      availability = this.calculateAvailability(
         settings.members,
         settings.length
       );
@@ -68,7 +68,7 @@ export class SprintHandler {
       { name, teamId },
       {
         settings,
-        availlability,
+        availability,
       }
     );
 
@@ -87,12 +87,12 @@ export class SprintHandler {
       throw new Error("Team not found in database");
     }
 
-    const availlability = this.calculateAvailability(
+    const availability = this.calculateAvailability(
       sprint.members,
       sprint.length
     );
 
-    await this.save(teamId, sprint, availlability.toFixed(2));
+    await this.save(teamId, sprint, availability.toFixed(2));
   }
 
   protected static async findSprints(teamId: string, query?: object) {
