@@ -5,7 +5,6 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useContext, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
 import { TeamContext } from "@/app/context/TeamContext";
 
@@ -18,7 +17,7 @@ const DAYS_OUT_ERROR =
   "The team members cannot be out for more than the length of the sprint. ";
 
 interface Props {
-  onSubmit: () => void;
+  onCreateSprint?: () => void;
 }
 
 const SprintForm = (props: Props) => {
@@ -30,7 +29,6 @@ const SprintForm = (props: Props) => {
   const [invalidLength, setInvalidLength] = useState(true);
   const [invalidDaysOut, setInvalidDaysOut] = useState(true);
 
-  const router = useRouter();
   const context = useContext(TeamContext);
 
   if (!context) {
@@ -71,6 +69,7 @@ const SprintForm = (props: Props) => {
       setInvalidDaysOut(true);
     }
 
+    setInvalidDaysOut(false);
     setMembers(value);
   };
 
@@ -110,7 +109,9 @@ const SprintForm = (props: Props) => {
           return;
         }
 
-        props.onSubmit();
+        if (props.onCreateSprint) {
+          props.onCreateSprint();
+        }
       })
       .catch((error) => {
         console.error(error);
