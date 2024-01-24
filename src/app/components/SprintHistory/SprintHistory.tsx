@@ -7,29 +7,42 @@ import { Sprint } from "@/types";
 import axios from "axios";
 import SprintHistoryCell from "./SprintHistoryCell";
 import SprintHistoryRow from "./SprintHistoryRow";
+import { stat } from "fs";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [loadedAll, setLoadedAll] = useState(false);
   const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     axios
-      .post("/api/sprint/get/all", {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
+      .post(
+        "/api/sprint/get/all",
+        { page },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      )
       .then((response) => {
         setIsLoading(false);
         if (response.status !== 201) {
           setShowError(true);
         }
 
-        setSprints(response.data.sprints as Sprint[]);
+        if (response.data.sprints.length === 0) {
+          setLoadedAll(true);
+        } else {
+          setSprints((state) => {
+            return [...state, ...response.data.sprints];
+          });
+        }
       });
-  }, []);
+  }, [page]);
 
   return (
     <section>
@@ -71,6 +84,11 @@ const SprintHistory = () => {
                 />
               );
             })}
+            {!loadedAll && (
+              <Button type="button" onClick={() => setPage(page + 1)}>
+                Load More
+              </Button>
+            )}
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { Sprint } from "@/types";
 import SprintHistoryCell from "./SprintHistoryCell";
+import Link from "next/link";
 
 interface Prop {
   sprint: Sprint;
@@ -11,7 +12,15 @@ const SprintHistoryRow = (props: Prop) => {
     <>
       <div className="col-span-3">
         <SprintHistoryCell className={props.className}>
-          {props.sprint.name}
+          {
+            <Link
+              href={encodeURI(
+                `/widget/${props.sprint.teamId}/${props.sprint.name}`
+              )}
+            >
+              {props.sprint.name}
+            </Link>
+          }
         </SprintHistoryCell>
       </div>
       <div className="col-start-4">
