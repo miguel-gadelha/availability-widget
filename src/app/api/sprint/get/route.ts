@@ -1,22 +1,23 @@
 import { SprintHandler } from "@/app/models/Sprint";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { name } = req.query;
+export async function POST(req: NextRequest) {
+  const { teamId, name } = await req.json();
 
-  if (!name) {
-    return res.status(400).json({ error: "Bad Request" });
+  if (!name || !teamId) {
+    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
-    const sprint = await SprintHandler.findByName(name as string);
+    const sprint = await SprintHandler.findByName(teamId, name);
 
     if (!sprint) {
-      return res.status(404).json({ error: "Sprint not found" });
+      return NextResponse.json({ error: "Sprint not found" }, { status: 404 });
     }
 
-    return res.status(200).json(sprint);
+    return NextResponse.json({ sprint }, { status: 201 });
   } catch (error) {
-    return res.status(500).json({ error });
+    console.error(error);
+    return NextResponse.json({ error }, { status: 500 });
   }
 }

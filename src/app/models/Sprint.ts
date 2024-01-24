@@ -95,17 +95,23 @@ export class SprintHandler {
     await this.save(teamId, sprint, availability.toFixed(2));
   }
 
-  protected static async findSprints(teamId: string, query?: object) {
+  protected static async findSprints(
+    teamId: string,
+    query?: object,
+    skip?: number,
+    limit?: number
+  ) {
     if (!teamId) {
       return;
     }
+    console.log("RAN");
 
     const db = Database.getInstance();
     let isConnected = false;
 
     isConnected = await db.connect();
 
-    if (!isConnected) {
+    if (!isConnected || !db) {
       throw new Error("Failed to connect to database");
     }
 
@@ -114,13 +120,19 @@ export class SprintHandler {
     if (query) {
       result = await db
         .getCollection("sprints")
-        .findOne({ _id: new ObjectId(teamId), ...{ query } });
+        .findOne({ teamId, ...{ query } });
     } else {
-      result = await db.getCollection("sprints").find({ teamId }).toArray();
+      result = await db
+        .getCollection("sprints")
+        .find({ teamId })
+        .skip(skip || 0)
+        .limit(limit || 0)
+        .toArray();
     }
 
     await db.close();
 
+    console.log("Finished");
     return result;
   }
 
@@ -128,7 +140,11 @@ export class SprintHandler {
     return await this.findSprints(teamId, { name: name });
   }
 
-  public static async findByTeamId(teamId: string) {
-    return await this.findSprints(teamId);
+  public static async findByTeamId(
+    teamId: string,
+    skip?: number,
+    limit?: number
+  ) {
+    return await this.findSprints(teamId, undefined, skip, limit);
   }
 }
