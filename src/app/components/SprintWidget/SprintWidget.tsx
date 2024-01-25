@@ -3,6 +3,7 @@
 import { Sprint } from "@/types";
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
+import Card from "../ui/Card";
 
 interface Props {
   teamId: string;
@@ -14,7 +15,6 @@ const SprintWidget = (props: Props) => {
   const [sprint, setSprint] = useState<Sprint | null>(null);
 
   useEffect(() => {
-    console.log("USEEFFECT");
     axios
       .post(
         "/api/sprint/get",
@@ -31,18 +31,39 @@ const SprintWidget = (props: Props) => {
           setError(true);
         }
 
-        setError(false);
         setSprint(response.data.sprint);
-      })
-      .catch((error) => {
-        console.log(error);
       });
-  });
+  }, [props.teamId, props.sprint]);
+
+  const availabilityType = (availabilty: number) => {
+    if (Number(availabilty) < 50) {
+      return "text-red-600";
+    }
+
+    if (Number(availabilityType) < 70) {
+      return "text-yellow-600";
+    }
+
+    return "text-green-600";
+  };
 
   return (
-    <div>
-      {JSON.stringify(sprint)} or {String(error)}
-    </div>
+    <>
+      {sprint && (
+        <Card>
+          <h3 className="text-slate-900 text-lg not-italic font-semibold leading-7 mb-5">
+            {decodeURI(sprint!.name)}
+          </h3>
+          <div
+            className={`w-36 h-9 text-[40px] not-italic font-semibold leading-7 ${availabilityType(
+              sprint.availability!
+            )}`}
+          >
+            {sprint.availability! * 1 + "%"}
+          </div>
+        </Card>
+      )}
+    </>
   );
 };
 
