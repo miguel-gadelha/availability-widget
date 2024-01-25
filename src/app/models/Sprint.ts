@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { Database } from "../lib/db";
 import { Team } from "./Team";
 import { Sprint } from "@/types";
@@ -34,7 +33,7 @@ export class SprintHandler {
     }
 
     const result = await db.getCollection("sprints").insertOne({
-      name: sprint.name,
+      name: encodeURI(sprint.name),
       length: sprint.length,
       members: sprint.members,
       availability: availability,
@@ -78,7 +77,12 @@ export class SprintHandler {
   }
 
   public async create(teamId: string, sprint: Sprint) {
-    if (await this.isNameExists(teamId, sprint.name)) {
+    const alreadyExists = await this.isNameExists(
+      teamId,
+      encodeURI(sprint.name)
+    );
+
+    if (alreadyExists) {
       throw new Error("Name already exists in database");
     }
     const team = await Team.findById(teamId);
@@ -104,7 +108,6 @@ export class SprintHandler {
     if (!teamId) {
       return;
     }
-    console.log("RAN");
 
     const db = Database.getInstance();
     let isConnected = false;
@@ -118,9 +121,7 @@ export class SprintHandler {
     let result;
 
     if (query) {
-      result = await db
-        .getCollection("sprints")
-        .findOne({ teamId, ...{ query } });
+      result = await db.getCollection("sprints").findOne({ teamId, ...query });
     } else {
       result = await db
         .getCollection("sprints")
@@ -132,7 +133,6 @@ export class SprintHandler {
 
     await db.close();
 
-    console.log("Finished");
     return result;
   }
 
