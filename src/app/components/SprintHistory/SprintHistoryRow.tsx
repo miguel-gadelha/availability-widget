@@ -13,12 +13,8 @@ const SprintHistoryRow = (props: Prop) => {
       <div className="col-span-3">
         <SprintHistoryCell className={props.className}>
           {
-            <Link
-              href={encodeURI(
-                `/widget/${props.sprint.teamId}/${props.sprint.name}`
-              )}
-            >
-              {props.sprint.name}
+            <Link href={`/widget/${props.sprint.teamId}/${props.sprint.name}`}>
+              {decodeURI(props.sprint.name)}
             </Link>
           }
         </SprintHistoryCell>

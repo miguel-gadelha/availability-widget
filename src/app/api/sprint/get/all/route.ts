@@ -2,7 +2,7 @@ import { withAuth } from "@/app/lib/auth/withAuth";
 import { SprintHandler } from "@/app/models/Sprint";
 import { NextRequest, NextResponse } from "next/server";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 10;
 
 export async function POST(req: NextRequest) {
   return await withAuth(req, async (team) => {

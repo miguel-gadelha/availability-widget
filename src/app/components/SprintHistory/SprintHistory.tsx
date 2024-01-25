@@ -84,7 +84,7 @@ const SprintHistory = () => {
                 />
               );
             })}
-            {!loadedAll && (
+            {!loadedAll && sprints.length === 10 && (
               <Button type="button" onClick={() => setPage(page + 1)}>
                 Load More
               </Button>
