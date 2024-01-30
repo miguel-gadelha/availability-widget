@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import Button from "../ui/Button";
-import { useEffect, useState } from "react";
 import { Sprint } from "@/types";
 import axios from "axios";
 import SprintHistoryCell from "./SprintHistoryCell";
 import SprintHistoryRow from "./SprintHistoryRow";
-import { stat } from "fs";
+import Dialog from "../ui/Dialog";
+import SprintForm from "../SprintForm/SprintForm";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -15,7 +16,7 @@ const SprintHistory = () => {
   const [page, setPage] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
   const [showError, setShowError] = useState(false);
-
+  const [openDialog, setOpenDialog] = useState(false);
   useEffect(() => {
     axios
       .post(
@@ -47,10 +48,17 @@ const SprintHistory = () => {
   return (
     <section>
       <div className="header w-full mb-11">
-        <Button type="button" className="flex items-center">
+        <Button
+          type="button"
+          className="flex items-center"
+          onClick={() => setOpenDialog(true)}
+        >
           <Plus size={16} className="mr-2" />
           New Sprint
         </Button>
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+          <SprintForm onCreateSprint={() => setOpenDialog(false)} />
+        </Dialog>
       </div>
       <div className="list-wrapper w-full">
         <h2 className="text-black text-2xl not-italic font-semibold leading-6 mb-4">

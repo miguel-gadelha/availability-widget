@@ -1,10 +1,10 @@
-import SprintForm from "../components/SprintForm/SprintForm";
+import SprintHistory from "../components/SprintHistory/SprintHistory";
 import TeamContextProvider from "../context/TeamContext";
 
 export default function Page() {
   return (
     <TeamContextProvider>
-      <SprintForm />
+      <SprintHistory />
     </TeamContextProvider>
   );
 }
