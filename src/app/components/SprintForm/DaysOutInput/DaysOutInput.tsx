@@ -21,13 +21,15 @@ const DaysOutInput = (props: Props) => {
     })) as MemberVacations[];
   }, [props.members]);
 
+  const [daysOut, setDaysOut] = useState<MemberVacations[]>([]);
+
   useEffect(() => {
     if (props.value?.length === 0) {
       setDaysOut(getEmptyState());
+    } else if (props.value && props.value.length > 0) {
+      setDaysOut(props.value);
     }
   }, [props.value, getEmptyState]);
-
-  const [daysOut, setDaysOut] = useState<MemberVacations[]>(getEmptyState);
 
   const handleInputChange = (name: string, value: string) => {
     setDaysOut((state: MemberVacations[]) => {
@@ -72,7 +74,12 @@ const DaysOutInput = (props: Props) => {
                 max={365}
                 step={5}
                 placeholder={"0"}
-                onChange={(e) => handleInputChange(member.name, e.target.value)}
+                onInput={(e) =>
+                  handleInputChange(
+                    member.name,
+                    (e.target as HTMLInputElement).value
+                  )
+                }
               ></input>
             </div>
           );
