@@ -68,6 +68,8 @@ const SprintForm = (props: Props) => {
       })
     ) {
       setInvalidDaysOut(true);
+    } else {
+      setInvalidDaysOut(false);
     }
 
     setMembers(value);

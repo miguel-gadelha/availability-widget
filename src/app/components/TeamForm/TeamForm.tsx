@@ -123,7 +123,7 @@ const TeamForm = () => {
           return;
         }
 
-        router.push("/login");
+        router.push("/auth/login");
       })
       .catch((error) => {
         console.error(error);
