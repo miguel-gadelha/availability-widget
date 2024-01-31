@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     try {
       const sprintHandler = new SprintHandler();
 
-      await sprintHandler.edit(team.teamId, name as string, settings);
+      await sprintHandler.edit(team._id, name as string, settings);
 
       return NextResponse.json(null, { status: 201 });
     } catch (error) {

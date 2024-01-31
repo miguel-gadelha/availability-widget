@@ -1,22 +1,22 @@
 import { Team } from "@/app/models/Team";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { email } = req.query;
+export async function POST(req: NextRequest) {
+  const email = req.nextUrl.searchParams.get("email");
 
   if (!email) {
-    res.status(400).json({ error: "Bad Request" });
+    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
   try {
-    const team = await Team.findByEmail(email as string);
+    const team = await Team.findByEmail(email);
 
     if (!team) {
-      return res.status(404).json({ error: "Team not found" });
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
-    return res.status(200).json(team);
+    return NextResponse.json(team, { status: 200 });
   } catch (error) {
-    return res.status(500).json({ error });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
