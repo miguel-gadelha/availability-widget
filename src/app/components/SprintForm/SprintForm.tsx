@@ -3,7 +3,7 @@
 import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
 import { TeamContext } from "@/app/context/TeamContext";
@@ -23,7 +23,7 @@ interface Props {
 const SprintForm = (props: Props) => {
   const [invalidMessage, setInvalidMessage] = useState("");
   const [name, setName] = useState("");
-  const [length, setLength] = useState<number | null>(null);
+  const [length, setLength] = useState<number | "">("");
   const [members, setMembers] = useState<MemberVacations[]>([]);
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
@@ -42,8 +42,9 @@ const SprintForm = (props: Props) => {
       setInvalidName(true);
     } else {
       setInvalidName(false);
-      setName(value);
     }
+
+    setName(value);
   };
 
   const handleLengthChange = (value: string) => {
@@ -53,24 +54,32 @@ const SprintForm = (props: Props) => {
       setInvalidLength(true);
     } else {
       setInvalidLength(false);
-      setLength(Number(value));
     }
+
+    setLength(Number(value));
   };
 
   const handleDaysOutChange = (value: MemberVacations[]) => {
     setInvalidMessage("");
-
     if (
       length &&
       value.some((memberVacation: MemberVacations) => {
-        return memberVacation.days > length;
+        return Number(memberVacation.days) > length;
       })
     ) {
       setInvalidDaysOut(true);
     }
 
-    setInvalidDaysOut(false);
     setMembers(value);
+  };
+
+  const clearInputs = () => {
+    setName("");
+    setLength("");
+    setMembers([]);
+    setInvalidMessage("");
+
+    console.log("this is clearing everything");
   };
 
   const handleSubmit = () => {
@@ -109,9 +118,9 @@ const SprintForm = (props: Props) => {
           return;
         }
 
-        if (props.onCreateSprint) {
-          props.onCreateSprint();
-        }
+        props.onCreateSprint?.();
+
+        clearInputs();
       })
       .catch((error) => {
         console.error(error);
@@ -130,6 +139,7 @@ const SprintForm = (props: Props) => {
         type="text"
         placeholder="Add your sprint name"
         label="Sprint Name"
+        value={name}
         onInputChange={handleNameChange}
       ></Input>
       <Input
@@ -137,12 +147,14 @@ const SprintForm = (props: Props) => {
         type="number"
         placeholder="Add the length of your sprint"
         label="Sprint Length"
+        value={String(length)}
         onInputChange={handleLengthChange}
       ></Input>
 
       <DaysOutInput
         members={context.teamMembers as string[]}
         label="Team Member's Days Out"
+        value={members}
         onInputChange={handleDaysOutChange}
       ></DaysOutInput>
 
