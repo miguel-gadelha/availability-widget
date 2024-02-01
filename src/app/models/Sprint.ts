@@ -99,6 +99,29 @@ export class SprintHandler {
     await this.save(teamId, sprint, availability.toFixed(2));
   }
 
+  public async delete(teamId: string, name: string) {
+    const alreadyExists = await this.isNameExists(teamId, encodeURI(name));
+
+    if (!alreadyExists) {
+      throw new Error("Sprint not found");
+    }
+
+    const db = Database.getInstance();
+    const isConnected = await db.connect();
+
+    if (!isConnected || !db) {
+      throw new Error("Failed to connect to database");
+    }
+
+    const result = await db
+      .getCollection("sprints")
+      .deleteOne({ teamId, name });
+
+    await db.close();
+
+    return result;
+  }
+
   protected static async findSprints(
     teamId: string,
     query?: object,
@@ -110,9 +133,7 @@ export class SprintHandler {
     }
 
     const db = Database.getInstance();
-    let isConnected = false;
-
-    isConnected = await db.connect();
+    const isConnected = await db.connect();
 
     if (!isConnected || !db) {
       throw new Error("Failed to connect to database");
