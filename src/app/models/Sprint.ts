@@ -147,6 +147,7 @@ export class SprintHandler {
       result = await db
         .getCollection("sprints")
         .find({ teamId })
+        .sort({ _id: -1 })
         .skip(skip || 0)
         .limit(limit || 0)
         .toArray();
