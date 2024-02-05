@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Edit, Plus, Trash } from "lucide-react";
 import Button from "../ui/Button";
 import { Sprint } from "@/types";
 import axios from "axios";
@@ -10,6 +10,11 @@ import SprintHistoryRow from "./SprintHistoryRow";
 import Dialog from "../ui/Dialog";
 import SprintForm from "../SprintForm/SprintForm";
 
+interface SprintRow extends Sprint {
+  key?: string;
+  selected?: boolean;
+}
+
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +22,9 @@ const SprintHistory = () => {
   const [loadedAll, setLoadedAll] = useState(false);
   const [showError, setShowError] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [radioSelected, setRadioSelected] = useState<string>("");
+
+  // Pagination handling
   useEffect(() => {
     axios
       .post(
@@ -45,8 +53,26 @@ const SprintHistory = () => {
       });
   }, [page]);
 
+  const handleEdit = () => {};
+
+  const handleDelete = () => {};
+
+  // Selection Handling
+  useEffect(() => {
+    setSprints((sprints: SprintRow[]) => {
+      return sprints.map((sprint) => {
+        if (sprint.key === radioSelected) {
+          return { ...sprint, selected: true };
+        } else {
+          return { ...sprint, selected: false };
+        }
+      });
+    });
+  }, [radioSelected]);
+
   return (
-    <section>
+    <section className="w-2/3">
+      <h2>{radioSelected}</h2>
       <div className="header w-full mb-11">
         <Button
           type="button"
@@ -61,9 +87,20 @@ const SprintHistory = () => {
         </Dialog>
       </div>
       <div className="list-wrapper w-full">
-        <h2 className="text-black text-2xl not-italic font-semibold leading-6 mb-4">
-          Sprint History
-        </h2>
+        <div className="list-header flex justify-between">
+          <h2 className="text-black text-2xl not-italic font-semibold leading-6 mb-4">
+            Sprint History
+          </h2>
+          <div className="control-buttons">
+            <button className="mr-2" onClick={handleEdit}>
+              <Edit></Edit>
+            </button>
+            <button onClick={handleDelete}>
+              <Trash></Trash>
+            </button>
+          </div>
+        </div>
+
         {isLoading ? (
           "Is loading"
         ) : (
@@ -83,12 +120,16 @@ const SprintHistory = () => {
                 Availability
               </SprintHistoryCell>
             </div>
-            {sprints.map((sprint: Sprint, key: number) => {
+            {sprints.map((sprint: SprintRow, key: number) => {
+              sprint.key = sprint.key || String(key);
+
               return (
                 <SprintHistoryRow
                   className="text-ellipsis text-base not-italic font-normal leading-6"
-                  key={key}
+                  key={sprint.key}
                   sprint={sprint}
+                  onSelected={() => setRadioSelected(sprint.key!)}
+                  selected={sprint.selected || false}
                 />
               );
             })}
