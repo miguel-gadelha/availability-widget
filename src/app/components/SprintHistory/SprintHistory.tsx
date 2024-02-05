@@ -72,7 +72,6 @@ const SprintHistory = () => {
 
   return (
     <section className="w-2/3">
-      <h2>{radioSelected}</h2>
       <div className="header w-full mb-11">
         <Button
           type="button"
