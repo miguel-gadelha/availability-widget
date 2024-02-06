@@ -9,6 +9,7 @@ import SprintHistoryCell from "./SprintHistoryCell";
 import SprintHistoryRow from "./SprintHistoryRow";
 import Dialog from "../ui/Dialog";
 import SprintForm from "../SprintForm/SprintForm";
+import { Popover, PopoverTrigger, PopoverContent } from "../ui/Popover";
 
 interface SprintRow extends Sprint {
   key?: string;
@@ -126,9 +127,43 @@ const SprintHistory = () => {
             <button className="mr-2" onClick={handleEdit}>
               <Edit></Edit>
             </button>
-            <button onClick={handleDelete}>
-              <Trash></Trash>
-            </button>
+
+            <Popover>
+              <PopoverTrigger
+                disabled={!radioSelected && radioSelected !== 0}
+                className={"text-slate-900 disabled:text-slate-400"}
+              >
+                <Trash></Trash>
+              </PopoverTrigger>
+              <PopoverContent className="bg-white w-52">
+                <div className="mb-3">
+                  <h4 className="font-medium leading-none mb-1 text-slate-900">
+                    Are you sure?
+                  </h4>
+                  <p className="text-sm text-slate-500 text-muted-foreground">
+                    This can&apos;t be undone
+                  </p>
+                </div>
+
+                <div className="flex">
+                  <Button
+                    type="button"
+                    className="w-1/2"
+                    onClick={handleDelete}
+                    variant="destructive"
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    type="button"
+                    className="w-1/2 ml-2"
+                    variant="secondary"
+                  >
+                    No
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
