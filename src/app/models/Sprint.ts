@@ -100,7 +100,7 @@ export class SprintHandler {
   }
 
   public async delete(teamId: string, name: string) {
-    const alreadyExists = await this.isNameExists(teamId, encodeURI(name));
+    const alreadyExists = await this.isNameExists(teamId, name);
 
     if (!alreadyExists) {
       throw new Error("Sprint not found");

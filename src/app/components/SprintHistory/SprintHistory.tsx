@@ -20,9 +20,9 @@ const SprintHistory = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
-  const [showError, setShowError] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [radioSelected, setRadioSelected] = useState<string>("");
+  const [radioSelected, setRadioSelected] = useState<number>();
+  const [showError, setShowError] = useState(false);
 
   // Pagination handling
   useEffect(() => {
@@ -55,13 +55,45 @@ const SprintHistory = () => {
 
   const handleEdit = () => {};
 
-  const handleDelete = () => {};
+  const handleDelete = () => {
+    if (!radioSelected && radioSelected !== 0) {
+      return;
+    }
+
+    axios
+      .post(
+        "/api/sprint/delete",
+        { name: sprints[radioSelected].name },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status !== 201) {
+          setShowError(true);
+        } else {
+          setSprints((sprints) => {
+            const newSprints = [...sprints];
+
+            newSprints.splice(radioSelected, 1);
+
+            return newSprints;
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
+  };
 
   // Selection Handling
   useEffect(() => {
     setSprints((sprints: SprintRow[]) => {
       return sprints.map((sprint) => {
-        if (sprint.key === radioSelected) {
+        if (Number(sprint.key) === radioSelected) {
           return { ...sprint, selected: true };
         } else {
           return { ...sprint, selected: false };
@@ -127,7 +159,7 @@ const SprintHistory = () => {
                   className="text-ellipsis text-base not-italic font-normal leading-6"
                   key={sprint.key}
                   sprint={sprint}
-                  onSelected={() => setRadioSelected(sprint.key!)}
+                  onSelected={() => setRadioSelected(Number(sprint.key!))}
                   selected={sprint.selected || false}
                 />
               );
