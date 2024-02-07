@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Edit, Plus, Trash } from "lucide-react";
 import Button from "../ui/Button";
 import { Sprint } from "@/types";
@@ -10,6 +10,7 @@ import SprintHistoryRow from "./SprintHistoryRow";
 import Dialog from "../ui/Dialog";
 import SprintForm from "../SprintForm/SprintForm";
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/Popover";
+import Spinner from "../ui/Spinner";
 
 interface SprintRow extends Sprint {
   key?: string;
@@ -18,12 +19,16 @@ interface SprintRow extends Sprint {
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [actionIsLoading, setActionIsLoading] = useState(false);
+  const [listIsLoading, setListIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [radioSelected, setRadioSelected] = useState<number>();
+  const [popupOpen, setPopupOpen] = useState(false);
   const [showError, setShowError] = useState(false);
+
+  const popover = useRef<HTMLDivElement>();
 
   // Pagination handling
   useEffect(() => {
@@ -39,7 +44,7 @@ const SprintHistory = () => {
         }
       )
       .then((response) => {
-        setIsLoading(false);
+        setListIsLoading(false);
         if (response.status !== 201) {
           setShowError(true);
         }
@@ -60,6 +65,8 @@ const SprintHistory = () => {
     if (!radioSelected && radioSelected !== 0) {
       return;
     }
+
+    setActionIsLoading(true);
 
     axios
       .post(
@@ -83,6 +90,10 @@ const SprintHistory = () => {
 
             return newSprints;
           });
+
+          setRadioSelected(undefined);
+          setPopupOpen(false);
+          setActionIsLoading(false);
         }
       })
       .catch((error) => {
@@ -103,6 +114,11 @@ const SprintHistory = () => {
     });
   }, [radioSelected]);
 
+  const onCreateSprint = (sprint: Sprint) => {
+    setSprints((sprints) => [sprint, ...sprints]);
+    setOpenDialog(false);
+  };
+
   return (
     <section className="w-2/3">
       <div className="header w-full mb-11">
@@ -115,7 +131,7 @@ const SprintHistory = () => {
           New Sprint
         </Button>
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <SprintForm onCreateSprint={() => setOpenDialog(false)} />
+          <SprintForm onCreateSprint={onCreateSprint} />
         </Dialog>
       </div>
       <div className="list-wrapper w-full">
@@ -128,7 +144,10 @@ const SprintHistory = () => {
               <Edit></Edit>
             </button>
 
-            <Popover>
+            <Popover
+              open={popupOpen}
+              onOpenChange={(open) => setPopupOpen(open)}
+            >
               <PopoverTrigger
                 disabled={!radioSelected && radioSelected !== 0}
                 className={"text-slate-900 disabled:text-slate-400"}
@@ -148,11 +167,14 @@ const SprintHistory = () => {
                 <div className="flex">
                   <Button
                     type="button"
-                    className="w-1/2"
+                    className={`w-1/2 flex items-center ${
+                      actionIsLoading ? "justify-between" : "justify-center"
+                    }`}
                     onClick={handleDelete}
                     variant="destructive"
                   >
                     Yes
+                    {actionIsLoading && <Spinner></Spinner>}
                   </Button>
                   <Button
                     type="button"
@@ -167,8 +189,10 @@ const SprintHistory = () => {
           </div>
         </div>
 
-        {isLoading ? (
-          "Is loading"
+        {listIsLoading ? (
+          <div className="w-full h-60 flex justify-center items-center">
+            <Spinner width={32} height={32} />
+          </div>
         ) : (
           <div className="list-items grid grid-cols-5 grid-flow-row gap-[1px] bg-slate-200 p-[1px]">
             <div className="col-span-3">
