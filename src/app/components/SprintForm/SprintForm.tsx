@@ -7,6 +7,8 @@ import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
 import { TeamContext } from "@/app/context/TeamContext";
+import { Sprint } from "@/types";
+import Spinner from "../ui/Spinner";
 
 const NAME_ERROR =
   "You must provide a unique name with more than 3 characters. ";
@@ -17,7 +19,7 @@ const DAYS_OUT_ERROR =
   "The team members cannot be out for more than the length of the sprint. ";
 
 interface Props {
-  onCreateSprint?: () => void;
+  onCreateSprint?: (sprint: Sprint) => void;
 }
 
 const SprintForm = (props: Props) => {
@@ -28,6 +30,7 @@ const SprintForm = (props: Props) => {
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
   const [invalidDaysOut, setInvalidDaysOut] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const context = useContext(TeamContext);
 
@@ -100,6 +103,8 @@ const SprintForm = (props: Props) => {
       return;
     }
 
+    setIsLoading(true);
+
     const request_body = {
       name,
       length,
@@ -120,7 +125,9 @@ const SprintForm = (props: Props) => {
           return;
         }
 
-        props.onCreateSprint?.();
+        props.onCreateSprint?.(request_body as Sprint);
+
+        setIsLoading(false);
 
         clearInputs();
       })
@@ -160,8 +167,13 @@ const SprintForm = (props: Props) => {
         onInputChange={handleDaysOutChange}
       ></DaysOutInput>
 
-      <Button type="button" className="w-full" onClick={handleSubmit}>
-        Continue
+      <Button
+        type="button"
+        className={`w-full flex items-center justify-center`}
+        onClick={handleSubmit}
+      >
+        Create
+        {isLoading && <Spinner className="ml-4" />}
       </Button>
 
       {invalidMessage && (
