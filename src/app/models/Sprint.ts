@@ -1,23 +1,9 @@
 import { Database } from "../lib/db";
+import SprintUtils from "../lib/utils/SprintUtils";
 import { Team } from "./Team";
 import { Sprint } from "@/types";
 
 export class SprintHandler {
-  private calculateAvailability(
-    members: Sprint["members"],
-    length: number
-  ): number {
-    const totalDaysOut = members.reduce(
-      (total, member) => total + member.days,
-      0
-    );
-
-    const totalSprintDays = length * members.length;
-    const actualSprintDays = totalSprintDays - totalDaysOut;
-
-    return (actualSprintDays * 100) / totalSprintDays;
-  }
-
   private async isNameExists(teamId: string, name: string): Promise<boolean> {
     return Boolean(await SprintHandler.findByName(teamId, name));
   }
@@ -57,7 +43,7 @@ export class SprintHandler {
     }
 
     if (settings.members && settings.length) {
-      availability = this.calculateAvailability(
+      availability = SprintUtils.calculateAvailability(
         settings.members,
         settings.length
       );
@@ -91,7 +77,7 @@ export class SprintHandler {
       throw new Error("Team not found in database");
     }
 
-    const availability = this.calculateAvailability(
+    const availability = SprintUtils.calculateAvailability(
       sprint.members,
       sprint.length
     );

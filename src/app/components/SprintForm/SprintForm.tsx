@@ -5,10 +5,11 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useContext, useState, useEffect } from "react";
 import axios from "axios";
-import DaysOutInput, { MemberVacations } from "./DaysOutInput/DaysOutInput";
+import DaysOutInput from "./DaysOutInput/DaysOutInput";
 import { TeamContext } from "@/app/context/TeamContext";
-import { Sprint } from "@/types";
+import { MemberVacations, Sprint } from "@/types";
 import Spinner from "../ui/Spinner";
+import SprintUtils from "@/app/lib/utils/SprintUtils";
 
 const NAME_ERROR =
   "You must provide a unique name with more than 3 characters. ";
@@ -64,10 +65,11 @@ const SprintForm = (props: Props) => {
 
   const handleDaysOutChange = (value: MemberVacations[]) => {
     setInvalidMessage("");
+
     if (
       length &&
       value.some((memberVacation: MemberVacations) => {
-        return Number(memberVacation.days) > length;
+        return Number(memberVacation.days) > length || !memberVacation.days;
       })
     ) {
       setInvalidDaysOut(true);
@@ -88,6 +90,8 @@ const SprintForm = (props: Props) => {
   };
 
   const handleSubmit = () => {
+    console.log(members);
+
     if (invalidName) {
       setInvalidMessage((message: string) => message + NAME_ERROR);
     }
@@ -125,7 +129,15 @@ const SprintForm = (props: Props) => {
           return;
         }
 
-        props.onCreateSprint?.(request_body as Sprint);
+        props.onCreateSprint?.({
+          name,
+          length: length as number,
+          members,
+          availability: SprintUtils.calculateAvailability(
+            members,
+            length as number
+          ),
+        } as Sprint);
 
         setIsLoading(false);
 
@@ -163,7 +175,7 @@ const SprintForm = (props: Props) => {
       <DaysOutInput
         members={context.teamMembers as string[]}
         label="Team Member's Days Out"
-        value={members}
+        daysOut={members}
         onInputChange={handleDaysOutChange}
       ></DaysOutInput>
 

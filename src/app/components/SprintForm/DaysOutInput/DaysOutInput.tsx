@@ -1,89 +1,82 @@
 "use client";
 
+import { MemberVacations } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 
-export type MemberVacations = { name: string; days: number | "" };
-
 interface Props {
+  daysOut: MemberVacations[];
   members: string[];
   label?: string;
-  value?: MemberVacations[];
   onInputChange: (vacations: MemberVacations[]) => void;
 }
 
-const DaysOutInput = (props: Props) => {
-  const id = `${props.label?.split(" ")[0].toLowerCase()}-input`;
+const DaysOutInput = ({ daysOut, members, label, onInputChange }: Props) => {
+  const id = `${label?.split(" ")[0].toLowerCase()}-input`;
 
   const getEmptyState = useCallback(() => {
-    return props.members.map((name: string) => ({
+    return members.map((name: string) => ({
       name,
       days: "",
     })) as MemberVacations[];
-  }, [props.members]);
-
-  const [daysOut, setDaysOut] = useState<MemberVacations[]>([]);
+  }, [members]);
 
   useEffect(() => {
-    if (props.value?.length === 0) {
-      setDaysOut(getEmptyState());
-    } else if (props.value && props.value.length > 0) {
-      setDaysOut(props.value);
+    if (daysOut.length === 0) {
+      onInputChange(getEmptyState());
     }
-  }, [props.value, getEmptyState]);
+  }, [daysOut, onInputChange, getEmptyState]);
 
-  const handleInputChange = (name: string, value: string) => {
-    setDaysOut((state: MemberVacations[]) => {
-      const newState = [...state];
-      const index = newState.findIndex((vacation) => vacation.name === name);
+  const handleInputChange = (name: string, memberDaysOut: number) => {
+    const newState = [...daysOut];
+    const index = newState.findIndex((vacation) => vacation.name === name);
 
-      if (index !== -1) {
-        newState[index] = { name, days: Number(value) };
-      }
+    if (index !== -1) {
+      newState[index] = { name, days: memberDaysOut };
+    }
 
-      props.onInputChange(newState);
+    onInputChange(newState);
 
-      return newState;
-    });
+    return newState;
   };
 
   return (
     <div className="days-out-input">
-      {props.label && (
+      {label && (
         <label
           htmlFor={id}
           className="text-sm font-medium leading-none block mb-2"
         >
-          {props.label}
+          {label}
         </label>
       )}
       <div className="member-inputs mb-5">
-        {daysOut.map((member: MemberVacations, i: number) => {
-          return (
-            <div
-              className="input-item w-full flex justify-between items-center gap-3 font-normal text-base leading-none mb-2"
-              key={`member-${i}`}
-            >
-              <span className="text-slate-600 text-sm not-italic font-medium leading-[100%]">
-                {member.name}
-              </span>
-              <input
-                className="rounded-md bg-white border border-gray-300 p-3 w-36"
-                type="number"
-                value={member.days}
-                min={0}
-                max={365}
-                step={5}
-                placeholder={"0"}
-                onInput={(e) =>
-                  handleInputChange(
-                    member.name,
-                    (e.target as HTMLInputElement).value
-                  )
-                }
-              ></input>
-            </div>
-          );
-        })}
+        {daysOut &&
+          daysOut.map((member: MemberVacations, i: number) => {
+            return (
+              <div
+                className="input-item w-full flex justify-between items-center gap-3 font-normal text-base leading-none mb-2"
+                key={`member-${i}`}
+              >
+                <span className="text-slate-600 text-sm not-italic font-medium leading-[100%]">
+                  {member.name}
+                </span>
+                <input
+                  className="rounded-md bg-white border border-gray-300 p-3 w-36"
+                  type="number"
+                  min={0}
+                  max={365}
+                  step={5}
+                  placeholder={"0"}
+                  onInput={(e) =>
+                    handleInputChange(
+                      member.name,
+                      Number((e.target as HTMLInputElement).value)
+                    )
+                  }
+                ></input>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
