@@ -18,17 +18,19 @@ export class SprintHandler {
       throw new Error("Failed to connect to database");
     }
 
-    const result = await db.getCollection("sprints").insertOne({
-      name: encodeURI(sprint.name),
-      length: sprint.length,
-      members: sprint.members,
-      availability: availability,
-      teamId,
-    });
+    try {
+      const result = await db.getCollection("sprints").insertOne({
+        name: encodeURI(sprint.name),
+        length: sprint.length,
+        members: sprint.members,
+        availability: availability,
+        teamId,
+      });
 
-    await db.close();
-
-    return result;
+      return result;
+    } finally {
+      await db.close();
+    }
   }
 
   public async edit(teamId: string, name: string, settings: Partial<Sprint>) {
@@ -49,17 +51,19 @@ export class SprintHandler {
       );
     }
 
-    const result = await db.getCollection("sprints").updateOne(
-      { name, teamId },
-      {
-        settings,
-        availability,
-      }
-    );
+    try {
+      const result = await db.getCollection("sprints").updateOne(
+        { name, teamId },
+        {
+          settings,
+          availability,
+        }
+      );
 
-    await db.close();
-
-    return result;
+      return result;
+    } finally {
+      await db.close();
+    }
   }
 
   public async create(teamId: string, sprint: Sprint) {
@@ -99,13 +103,15 @@ export class SprintHandler {
       throw new Error("Failed to connect to database");
     }
 
-    const result = await db
-      .getCollection("sprints")
-      .deleteOne({ teamId, name });
+    try {
+      const result = await db
+        .getCollection("sprints")
+        .deleteOne({ teamId, name });
 
-    await db.close();
-
-    return result;
+      return result;
+    } finally {
+      await db.close();
+    }
   }
 
   protected static async findSprints(
@@ -127,21 +133,25 @@ export class SprintHandler {
 
     let result;
 
-    if (query) {
-      result = await db.getCollection("sprints").findOne({ teamId, ...query });
-    } else {
-      result = await db
-        .getCollection("sprints")
-        .find({ teamId })
-        .sort({ _id: -1 })
-        .skip(skip || 0)
-        .limit(limit || 0)
-        .toArray();
+    try {
+      if (query) {
+        result = await db
+          .getCollection("sprints")
+          .findOne({ teamId, ...query });
+      } else {
+        result = await db
+          .getCollection("sprints")
+          .find({ teamId })
+          .sort({ _id: -1 })
+          .skip(skip || 0)
+          .limit(limit || 0)
+          .toArray();
+      }
+
+      return result;
+    } finally {
+      await db.close();
     }
-
-    await db.close();
-
-    return result;
   }
 
   public static async findByName(teamId: string, name: string) {

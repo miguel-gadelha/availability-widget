@@ -129,8 +129,10 @@ const SprintForm = (props: Props) => {
           return;
         }
 
+        // TODO - Delete doesn't work for newly added sprints (before reload)
+
         props.onCreateSprint?.({
-          name,
+          name: encodeURI(name),
           length: length as number,
           members,
           availability: SprintUtils.calculateAvailability(
