@@ -3,12 +3,11 @@
 import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import DaysOutInput from "./DaysOutInput/DaysOutInput";
 import { TeamContext } from "@/app/context/TeamContext";
 import { MemberVacations, Sprint } from "@/types";
-import Spinner from "../ui/Spinner";
 import SprintUtils from "@/app/lib/utils/SprintUtils";
 
 const NAME_ERROR =
@@ -21,19 +20,39 @@ const DAYS_OUT_ERROR =
 
 interface Props {
   onCreateSprint?: (sprint: Sprint) => void;
+  activeSprint?: Sprint;
+  isLoading?: boolean;
+  title?: string;
 }
 
-const SprintForm = (props: Props) => {
-  const [invalidMessage, setInvalidMessage] = useState("");
-  const [name, setName] = useState("");
-  const [length, setLength] = useState<number | "">("");
-  const [members, setMembers] = useState<MemberVacations[]>([]);
+const SprintForm = ({
+  onCreateSprint,
+  activeSprint,
+  title = "New Sprint",
+}: Props) => {
+  const [name, setName] = useState(activeSprint?.name || "");
+  const [length, setLength] = useState<number | "">(activeSprint?.length || "");
+  const [members, setMembers] = useState<MemberVacations[]>(
+    activeSprint?.members || []
+  );
   const [invalidName, setInvalidName] = useState(true);
   const [invalidLength, setInvalidLength] = useState(true);
   const [invalidDaysOut, setInvalidDaysOut] = useState(true);
+  const [invalidMessage, setInvalidMessage] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const context = useContext(TeamContext);
+
+  useEffect(() => {
+    if (activeSprint) {
+      setName(decodeURI(activeSprint.name));
+      setLength(activeSprint.length);
+      setMembers(activeSprint.members);
+
+      console.log(activeSprint.members);
+    }
+  }, [activeSprint]);
 
   if (!context) {
     return;
@@ -85,13 +104,9 @@ const SprintForm = (props: Props) => {
     setLength("");
     setMembers([]);
     setInvalidMessage("");
-
-    console.log("this is clearing everything");
   };
 
   const handleSubmit = () => {
-    console.log(members);
-
     if (invalidName) {
       setInvalidMessage((message: string) => message + NAME_ERROR);
     }
@@ -129,9 +144,7 @@ const SprintForm = (props: Props) => {
           return;
         }
 
-        // TODO - Delete doesn't work for newly added sprints (before reload)
-
-        props.onCreateSprint?.({
+        onCreateSprint?.({
           name: encodeURI(name),
           length: length as number,
           members,
@@ -154,7 +167,7 @@ const SprintForm = (props: Props) => {
   return (
     <Card className="team-form w-[384px]">
       <h3 className="text-slate-900 text-lg leading-7 font-bold mb-5">
-        New Sprint
+        {title}
       </h3>
 
       <Input
@@ -185,9 +198,9 @@ const SprintForm = (props: Props) => {
         type="button"
         className={`w-full flex items-center justify-center`}
         onClick={handleSubmit}
+        isLoading={isLoading}
       >
         Create
-        {isLoading && <Spinner className="ml-4" />}
       </Button>
 
       {invalidMessage && (

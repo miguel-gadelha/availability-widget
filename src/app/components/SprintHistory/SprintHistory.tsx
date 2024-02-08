@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Edit, Plus, Trash } from "lucide-react";
 import Button from "../ui/Button";
 import { Sprint } from "@/types";
@@ -21,17 +21,22 @@ const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [actionIsLoading, setActionIsLoading] = useState(false);
   const [listIsLoading, setListIsLoading] = useState(true);
+  const [moreIsLoading, setMoreIsLoading] = useState(false);
+
   const [page, setPage] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
+
   const [openDialog, setOpenDialog] = useState(false);
+
   const [radioSelected, setRadioSelected] = useState<number>();
   const [popupOpen, setPopupOpen] = useState(false);
   const [showError, setShowError] = useState(false);
-
-  const popover = useRef<HTMLDivElement>();
+  const [activeSprint, setActiveSprint] = useState<Sprint>();
 
   // Pagination handling
   useEffect(() => {
+    setMoreIsLoading(true);
+
     axios
       .post(
         "/api/sprint/get/all",
@@ -56,10 +61,13 @@ const SprintHistory = () => {
             return [...state, ...response.data.sprints];
           });
         }
+        setMoreIsLoading(false);
       });
   }, [page]);
 
-  const handleEdit = () => {};
+  const handleEdit = () => {
+    setOpenDialog(true);
+  };
 
   const handleDelete = () => {
     if (!radioSelected && radioSelected !== 0) {
@@ -101,22 +109,32 @@ const SprintHistory = () => {
       });
   };
 
+  const handleNewSprint = () => {
+    setRadioSelected(undefined);
+    setOpenDialog(true);
+  };
+
   // Selection Handling
   useEffect(() => {
     setSprints((sprints: SprintRow[]) => {
-      return sprints.map((sprint) => {
+      const newSprints = sprints.map((sprint) => {
         if (Number(sprint.key) === radioSelected) {
           return { ...sprint, selected: true };
         } else {
           return { ...sprint, selected: false };
         }
       });
+
+      setActiveSprint(newSprints[radioSelected!]);
+
+      return newSprints;
     });
   }, [radioSelected]);
 
   const onCreateSprint = (sprint: Sprint) => {
     setSprints((sprints) => [sprint, ...sprints]);
     setOpenDialog(false);
+    setRadioSelected(undefined);
   };
 
   return (
@@ -125,13 +143,17 @@ const SprintHistory = () => {
         <Button
           type="button"
           className="flex items-center"
-          onClick={() => setOpenDialog(true)}
+          onClick={handleNewSprint}
         >
           <Plus size={16} className="mr-2" />
           New Sprint
         </Button>
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <SprintForm onCreateSprint={onCreateSprint} />
+          <SprintForm
+            title={radioSelected !== undefined ? "Edit Sprint" : "New Sprint"}
+            onCreateSprint={onCreateSprint}
+            activeSprint={activeSprint}
+          />
         </Dialog>
       </div>
       <div className="list-wrapper w-full">
@@ -140,7 +162,11 @@ const SprintHistory = () => {
             Sprint History
           </h2>
           <div className="control-buttons">
-            <button className="mr-2" onClick={handleEdit}>
+            <button
+              onClick={handleEdit}
+              disabled={!radioSelected && radioSelected !== 0}
+              className={"mr-2 text-slate-900 disabled:text-slate-400"}
+            >
               <Edit></Edit>
             </button>
 
@@ -167,14 +193,12 @@ const SprintHistory = () => {
                 <div className="flex">
                   <Button
                     type="button"
-                    className={`w-1/2 flex items-center ${
-                      actionIsLoading ? "justify-between" : "justify-center"
-                    }`}
+                    className={`w-1/2`}
                     onClick={handleDelete}
                     variant="destructive"
+                    isLoading={actionIsLoading}
                   >
                     Yes
-                    {actionIsLoading && <Spinner></Spinner>}
                   </Button>
                   <Button
                     type="button"
@@ -211,7 +235,7 @@ const SprintHistory = () => {
               </SprintHistoryCell>
             </div>
             {sprints.map((sprint: SprintRow, key: number) => {
-              sprint.key = sprint.key || String(key);
+              sprint.key = String(key);
 
               return (
                 <SprintHistoryRow
@@ -223,14 +247,20 @@ const SprintHistory = () => {
                 />
               );
             })}
-            {!loadedAll && sprints.length === 10 && (
-              <Button type="button" onClick={() => setPage(page + 1)}>
-                Load More
-              </Button>
-            )}
           </div>
         )}
       </div>
+      {!loadedAll && sprints.length === 10 && (
+        <div className="w-full flex justify-center mt-8">
+          <Button
+            type="button"
+            onClick={() => setPage(page + 1)}
+            isLoading={moreIsLoading}
+          >
+            Load More
+          </Button>
+        </div>
+      )}
     </section>
   );
 };
