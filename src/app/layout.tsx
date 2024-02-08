@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <main className="bg-white flex justify-center items-center h-screen w-full">
           {children}
+          <Analytics />
         </main>
       </body>
     </html>
