@@ -13,13 +13,13 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      await sprintHandler.create(team._id, {
+      const response = await sprintHandler.create(team._id, {
         name,
         length,
         members,
       });
 
-      return NextResponse.json(null, { status: 201 });
+      return NextResponse.json({ response }, { status: 201 });
     } catch (error) {
       console.error(error);
       return NextResponse.json(

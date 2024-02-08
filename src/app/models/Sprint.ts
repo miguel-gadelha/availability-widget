@@ -86,7 +86,7 @@ export class SprintHandler {
       sprint.length
     );
 
-    await this.save(teamId, sprint, availability.toFixed(2));
+    return await this.save(teamId, sprint, availability.toFixed(2));
   }
 
   public async delete(teamId: string, name: string) {
