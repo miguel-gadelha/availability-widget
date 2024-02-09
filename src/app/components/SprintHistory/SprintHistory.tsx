@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit, Plus, Trash } from "lucide-react";
+import { Edit } from "lucide-react";
 import Button from "../ui/Button";
 import { Sprint } from "@/types";
 import axios from "axios";
-import Dialog from "../ui/Dialog";
-import SprintForm from "../SprintForm/SprintForm";
 import Spinner from "../ui/Spinner";
 import SprintList, { SprintRow } from "../SprintList/SprintList";
 import DeleteSprintButton from "./actions/DeleteSprintButton";
+import NewSprintButton from "./actions/NewSprintButton";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -18,8 +17,6 @@ const SprintHistory = () => {
 
   const [page, setPage] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
-
-  const [openDialog, setOpenDialog] = useState(false);
 
   const [showError, setShowError] = useState(false);
   const [activeSprint, setActiveSprint] = useState<SprintRow>();
@@ -56,19 +53,30 @@ const SprintHistory = () => {
       });
   }, [page]);
 
-  const handleSprintSelection = (key: number) => {
+  // Updating Selection
+  useEffect(() => {
     setSprints((sprints: SprintRow[]) => {
-      const newSprints = sprints.map((sprint) => {
-        if (Number(sprint.key) === key) {
-          return { ...sprint, selected: true };
-        } else {
+      let newSprints;
+
+      if (activeSprint?.key) {
+        newSprints = sprints.map((sprint) => {
+          if (sprint.key === activeSprint.key) {
+            return { ...sprint, selected: true };
+          } else {
+            return { ...sprint, selected: false };
+          }
+        });
+      } else {
+        newSprints = sprints.map((sprint) => {
           return { ...sprint, selected: false };
-        }
-      });
+        });
+      }
 
       return newSprints;
     });
+  }, [activeSprint]);
 
+  const handleSprintSelection = (key: number) => {
     setActiveSprint(sprints[key]);
   };
 
@@ -76,11 +84,11 @@ const SprintHistory = () => {
     setOpenDialog(true);
   };
 
-  const handleOnDelete = () => {
+  const handleOnDelete = (key: number) => {
     setSprints((sprints) => {
       const newSprints = [...sprints];
 
-      newSprints.splice(Number(activeSprint!.key), 1);
+      newSprints.splice(key, 1);
 
       return newSprints;
     });
@@ -88,35 +96,18 @@ const SprintHistory = () => {
     setActiveSprint(undefined);
   };
 
-  const handleNewSprint = () => {
-    setOpenDialog(true);
-    setActiveSprint(undefined);
-  };
-
-  const onCreateSprint = (sprint: Sprint) => {
+  const handleOnCreatedSprint = (sprint: Sprint) => {
     setSprints((sprints) => [sprint, ...sprints]);
-    setOpenDialog(false);
     setActiveSprint(undefined);
   };
 
   return (
     <section className="w-2/3">
       <div className="header w-full mb-11">
-        <Button
-          type="button"
-          className="flex items-center"
-          onClick={handleNewSprint}
-        >
-          <Plus size={16} className="mr-2" />
-          New Sprint
-        </Button>
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <SprintForm
-            title={activeSprint ? "Edit Sprint" : "New Sprint"}
-            onCreateSprint={onCreateSprint}
-            activeSprint={activeSprint}
-          />
-        </Dialog>
+        <NewSprintButton
+          onClick={() => setActiveSprint(undefined)}
+          onSprintCreate={handleOnCreatedSprint}
+        />
       </div>
       <div className="list-wrapper w-full">
         <div className="list-header flex justify-between">

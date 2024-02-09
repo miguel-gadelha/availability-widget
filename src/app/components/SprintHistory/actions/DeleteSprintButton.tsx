@@ -14,7 +14,7 @@ import { useState } from "react";
 interface Props {
   sprintToDelete?: SprintRow;
   onError?: () => void;
-  onDelete?: () => void;
+  onDelete?: (key: number) => void;
 }
 
 const DeleteSprintButton = ({ sprintToDelete, onError, onDelete }: Props) => {
@@ -45,7 +45,7 @@ const DeleteSprintButton = ({ sprintToDelete, onError, onDelete }: Props) => {
         } else {
           setIsLoading(false);
           setIsOpen(false);
-          onDelete?.();
+          onDelete?.(Number(sprintToDelete.key));
         }
       })
       .catch((error) => {
