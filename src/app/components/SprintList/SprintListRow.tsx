@@ -1,9 +1,9 @@
 "use client";
 
 import { Sprint } from "@/types";
-import SprintHistoryCell from "./SprintHistoryCell";
+import SprintListCell from "./SprintListCell";
 import Link from "next/link";
-import { ChangeEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import RadioButton from "../ui/RadioButton";
 
 interface Prop {
@@ -13,12 +13,7 @@ interface Prop {
   onSelected: () => void;
 }
 
-const SprintHistoryRow = ({
-  sprint,
-  className,
-  selected,
-  onSelected,
-}: Prop) => {
+const SprintListRow = ({ sprint, className, selected, onSelected }: Prop) => {
   const [selectedRow, setSelectedRow] = useState(selected);
 
   useEffect(() => {
@@ -32,7 +27,7 @@ const SprintHistoryRow = ({
   return (
     <>
       <div className="col-span-3">
-        <SprintHistoryCell className={className} selected={selectedRow}>
+        <SprintListCell className={className} selected={selectedRow}>
           <RadioButton
             checked={selectedRow}
             onChange={handleSelectionChange}
@@ -42,26 +37,26 @@ const SprintHistoryRow = ({
           <Link href={`/widget/${sprint.teamId}/${sprint.name}`}>
             {decodeURI(sprint.name)}
           </Link>
-        </SprintHistoryCell>
+        </SprintListCell>
       </div>
       <div className="col-start-4">
-        <SprintHistoryCell
+        <SprintListCell
           className={className + " flex justify-end"}
           selected={selectedRow}
         >
           {sprint.length}
-        </SprintHistoryCell>
+        </SprintListCell>
       </div>
       <div className="col-start-5">
-        <SprintHistoryCell
+        <SprintListCell
           className={className + " flex justify-end"}
           selected={selectedRow}
         >
           {Number(sprint.availability) + "%"}
-        </SprintHistoryCell>
+        </SprintListCell>
       </div>
     </>
   );
 };
 
-export default SprintHistoryRow;
+export default SprintListRow;

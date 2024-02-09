@@ -6,7 +6,7 @@ interface Props {
   children?: ReactNode;
 }
 
-const SprintHistoryCell = (props: Props) => {
+const SprintListCell = (props: Props) => {
   return (
     <div
       className={`h-10 flex items-center px-4 py-2 text-nowrap ${
@@ -18,4 +18,4 @@ const SprintHistoryCell = (props: Props) => {
   );
 };
 
-export default SprintHistoryCell;
+export default SprintListCell;

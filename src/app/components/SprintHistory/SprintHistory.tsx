@@ -5,17 +5,11 @@ import { Edit, Plus, Trash } from "lucide-react";
 import Button from "../ui/Button";
 import { Sprint } from "@/types";
 import axios from "axios";
-import SprintHistoryCell from "./SprintHistoryCell";
-import SprintHistoryRow from "./SprintHistoryRow";
 import Dialog from "../ui/Dialog";
 import SprintForm from "../SprintForm/SprintForm";
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/Popover";
 import Spinner from "../ui/Spinner";
-
-interface SprintRow extends Sprint {
-  key?: string;
-  selected?: boolean;
-}
+import SprintList, { SprintRow } from "../SprintList/SprintList";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -218,36 +212,7 @@ const SprintHistory = () => {
             <Spinner width={32} height={32} />
           </div>
         ) : (
-          <div className="list-items grid grid-cols-5 grid-flow-row gap-[1px] bg-slate-200 p-[1px]">
-            <div className="col-span-3">
-              <SprintHistoryCell className="text-ellipsis text-base not-italic font-bold leading-6">
-                Name
-              </SprintHistoryCell>
-            </div>
-            <div className="col-start-4">
-              <SprintHistoryCell className="text-ellipsis text-base not-italic font-bold leading-6">
-                Length (in days)
-              </SprintHistoryCell>
-            </div>
-            <div className="col-start-5">
-              <SprintHistoryCell className="text-ellipsis text-base not-italic font-bold leading-6">
-                Availability
-              </SprintHistoryCell>
-            </div>
-            {sprints.map((sprint: SprintRow, key: number) => {
-              sprint.key = String(key);
-
-              return (
-                <SprintHistoryRow
-                  className="text-ellipsis text-base not-italic font-normal leading-6"
-                  key={sprint.key}
-                  sprint={sprint}
-                  onSelected={() => setRadioSelected(Number(sprint.key!))}
-                  selected={sprint.selected || false}
-                />
-              );
-            })}
-          </div>
+          <SprintList sprints={sprints} onSelected={setRadioSelected} />
         )}
       </div>
       {!loadedAll && sprints.length === 10 && (
