@@ -9,6 +9,7 @@ import Spinner from "../ui/Spinner";
 import SprintList, { SprintRow } from "../SprintList/SprintList";
 import DeleteSprintButton from "./actions/DeleteSprintButton";
 import NewSprintButton from "./actions/NewSprintButton";
+import TeamContextProvider from "@/app/context/TeamContext";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -80,9 +81,7 @@ const SprintHistory = () => {
     setActiveSprint(sprints[key]);
   };
 
-  const handleEdit = () => {
-    setOpenDialog(true);
-  };
+  const handleEdit = () => {};
 
   const handleOnDelete = (key: number) => {
     setSprints((sprints) => {
@@ -104,10 +103,12 @@ const SprintHistory = () => {
   return (
     <section className="w-2/3">
       <div className="header w-full mb-11">
-        <NewSprintButton
-          onClick={() => setActiveSprint(undefined)}
-          onSprintCreate={handleOnCreatedSprint}
-        />
+        <TeamContextProvider>
+          <NewSprintButton
+            onClick={() => setActiveSprint(undefined)}
+            onSprintCreate={handleOnCreatedSprint}
+          />
+        </TeamContextProvider>
       </div>
       <div className="list-wrapper w-full">
         <div className="list-header flex justify-between">

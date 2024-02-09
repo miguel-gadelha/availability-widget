@@ -1,30 +1,13 @@
-"use client";
-
 import { MemberVacations } from "@/types";
-import { useCallback, useEffect, useState } from "react";
 
 interface Props {
   daysOut: MemberVacations[];
-  members: string[];
   label?: string;
   onInputChange: (vacations: MemberVacations[]) => void;
 }
 
-const DaysOutInput = ({ daysOut, members, label, onInputChange }: Props) => {
+const DaysOutInput = ({ daysOut, label, onInputChange }: Props) => {
   const id = `${label?.split(" ")[0].toLowerCase()}-input`;
-
-  const getEmptyState = useCallback(() => {
-    return members.map((name: string) => ({
-      name,
-      days: "",
-    })) as MemberVacations[];
-  }, [members]);
-
-  useEffect(() => {
-    if (daysOut.length === 0) {
-      onInputChange(getEmptyState());
-    }
-  }, [daysOut, onInputChange, getEmptyState]);
 
   const handleInputChange = (name: string, memberDaysOut: number) => {
     const newState = [...daysOut];

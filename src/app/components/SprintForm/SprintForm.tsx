@@ -3,167 +3,112 @@
 import Input from "../Input/Input";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import DaysOutInput from "./DaysOutInput/DaysOutInput";
-import { TeamContext } from "@/app/context/TeamContext";
 import { MemberVacations, Sprint } from "@/types";
-import SprintUtils from "@/app/lib/utils/SprintUtils";
-
-const NAME_ERROR =
-  "You must provide a unique name with more than 3 characters. ";
-const LENGTH_ERROR = "Sprint length must be at least 1 day. ";
-const GENERIC_ERROR =
-  "Something went wrong creating your sprint. Please try again in a few seconds. ";
-const DAYS_OUT_ERROR =
-  "The team members cannot be out for more than the length of the sprint. ";
 
 interface Props {
-  onCreateSprint?: (sprint: Sprint) => void;
-  activeSprint?: Sprint;
+  sprint: Sprint;
   isLoading?: boolean;
   title?: string;
+  submitTitle?: string;
+  onInputChange: (sprint: Sprint) => void;
+  onComplete?: (sprint: Sprint) => void;
+  onSubmit?: () => void;
 }
 
 const SprintForm = ({
-  onCreateSprint,
-  activeSprint,
+  sprint,
   title = "New Sprint",
+  submitTitle = "Save",
+  isLoading,
+  onInputChange,
+  onSubmit,
 }: Props) => {
-  const [name, setName] = useState(activeSprint?.name || "");
-  const [length, setLength] = useState<number | "">(activeSprint?.length || "");
-  const [members, setMembers] = useState<MemberVacations[]>(
-    activeSprint?.members || []
-  );
-  const [invalidName, setInvalidName] = useState(true);
-  const [invalidLength, setInvalidLength] = useState(true);
-  const [invalidDaysOut, setInvalidDaysOut] = useState(true);
-  const [invalidMessage, setInvalidMessage] = useState("");
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const context = useContext(TeamContext);
-
-  useEffect(() => {
-    if (activeSprint) {
-      setName(decodeURI(activeSprint.name));
-      setLength(activeSprint.length);
-      setMembers(activeSprint.members);
-
-      console.log(activeSprint.members);
-    }
-  }, [activeSprint]);
-
-  if (!context) {
-    return;
-  }
-
-  const handleNameChange = (value: string) => {
-    setInvalidMessage("");
-
-    if (value.length < 3) {
-      setInvalidName(true);
-    } else {
-      setInvalidName(false);
-    }
-
-    setName(value);
+  const noErrors = {
+    name: "",
+    length: "",
+    members: "",
   };
 
-  const handleLengthChange = (value: string) => {
-    setInvalidMessage("");
+  const [errors, setErrors] = useState(noErrors);
 
-    if (Number(value) < 1) {
-      setInvalidLength(true);
-    } else {
-      setInvalidLength(false);
-    }
-
-    setLength(Number(value));
+  const handleNameChange = (name: string) => {
+    setErrors(noErrors);
+    onInputChange({ ...sprint, name: name });
   };
 
-  const handleDaysOutChange = (value: MemberVacations[]) => {
-    setInvalidMessage("");
-
-    if (
-      length &&
-      value.some((memberVacation: MemberVacations) => {
-        return Number(memberVacation.days) > length || !memberVacation.days;
-      })
-    ) {
-      setInvalidDaysOut(true);
-    } else {
-      setInvalidDaysOut(false);
-    }
-
-    setMembers(value);
+  const handleLengthChange = (length: string) => {
+    setErrors(noErrors);
+    onInputChange({ ...sprint, length: Number(length) });
   };
 
-  const clearInputs = () => {
-    setName("");
-    setLength("");
-    setMembers([]);
-    setInvalidMessage("");
+  const handleMembersChange = (members: MemberVacations[]) => {
+    setErrors(noErrors);
+    onInputChange({ ...sprint, members: members });
   };
 
   const handleSubmit = () => {
-    if (invalidName) {
-      setInvalidMessage((message: string) => message + NAME_ERROR);
-    }
-    if (invalidLength) {
-      setInvalidMessage((message: string) => message + LENGTH_ERROR);
-    }
-
-    if (invalidDaysOut) {
-      setInvalidMessage((message: string) => message + DAYS_OUT_ERROR);
+    if (sprint.name.length < 3) {
+      setErrors((errors) => {
+        return {
+          ...errors,
+          name: "You must provide a unique name with more than 3 characters",
+        };
+      });
     }
 
-    if (invalidName || invalidLength || invalidDaysOut) {
+    if (sprint.length < 1) {
+      setErrors((errors) => {
+        return { ...errors, length: "Sprint length must be at least 1 day" };
+      });
+    }
+
+    if (
+      length &&
+      sprint.members.some((memberVacation: MemberVacations) => {
+        return Number(memberVacation.days) > length;
+      })
+    ) {
+      setErrors((errors) => {
+        return {
+          ...errors,
+          members:
+            "The team members cannot be out for more than the length of the sprint",
+        };
+      });
+    }
+
+    if (
+      length &&
+      sprint.members.some((memberVacation: MemberVacations) => {
+        return !memberVacation.days;
+      })
+    ) {
+      setErrors((errors) => {
+        return {
+          ...errors,
+          members: "You have to fill in the days out of each team member",
+        };
+      });
+    }
+
+    if (errors.name || errors.length || errors.members) {
       return;
     }
 
-    setIsLoading(true);
-
-    const request_body = {
-      name,
-      length,
-      members,
-    };
-
-    axios
-      .post("/api/sprint/create", request_body, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        if (response.status !== 201) {
-          console.error(response);
-          setInvalidMessage(GENERIC_ERROR);
-          return;
-        }
-
-        onCreateSprint?.({
-          name: encodeURI(name),
-          length: length as number,
-          members,
-          availability: SprintUtils.calculateAvailability(
-            members,
-            length as number
-          ),
-        } as Sprint);
-
-        setIsLoading(false);
-
-        clearInputs();
-      })
-      .catch((error) => {
-        console.error(error);
-        setInvalidMessage(GENERIC_ERROR);
-      });
+    onSubmit?.();
   };
 
+  const renderErrorMessage = () => {
+    let message;
+
+    for (let error in errors) {
+      message = `${message} ${error}, `;
+    }
+
+    return message;
+  };
   return (
     <Card className="team-form w-[384px]">
       <h3 className="text-slate-900 text-lg leading-7 font-bold mb-5">
@@ -171,27 +116,26 @@ const SprintForm = ({
       </h3>
 
       <Input
-        className={`mb-4 ${invalidName ? "border-red-500" : ""}`}
+        className={`mb-4 ${errors.name ? "border-red-500" : ""}`}
         type="text"
         placeholder="Add your sprint name"
         label="Sprint Name"
-        value={name}
+        value={sprint.name}
         onInputChange={handleNameChange}
       ></Input>
       <Input
-        className={`mb-4 ${invalidLength ? "border-red-500" : ""}`}
+        className={`mb-4 ${errors.length ? "border-red-500" : ""}`}
         type="number"
         placeholder="Add the length of your sprint"
         label="Sprint Length"
-        value={String(length)}
+        value={String(sprint.length)}
         onInputChange={handleLengthChange}
       ></Input>
 
       <DaysOutInput
-        members={context.teamMembers as string[]}
         label="Team Member's Days Out"
-        daysOut={members}
-        onInputChange={handleDaysOutChange}
+        daysOut={sprint.members}
+        onInputChange={handleMembersChange}
       ></DaysOutInput>
 
       <Button
@@ -200,11 +144,11 @@ const SprintForm = ({
         onClick={handleSubmit}
         isLoading={isLoading}
       >
-        Create
+        {submitTitle}
       </Button>
 
-      {invalidMessage && (
-        <div className="error p-2 text-red-600">{invalidMessage}</div>
+      {(errors.name || errors.length || errors.members) && (
+        <div className="error p-2 text-red-600">{renderErrorMessage()}</div>
       )}
     </Card>
   );
