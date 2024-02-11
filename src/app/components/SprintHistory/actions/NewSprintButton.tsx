@@ -106,6 +106,7 @@ const NewSprintButton = ({ onClick, onSprintCreate }: Props) => {
             sprint={newSprint}
             onSubmit={handleSubmit}
             onInputChange={handleChange}
+            isLoading={isLoading}
           />
         )}
       </Dialog>

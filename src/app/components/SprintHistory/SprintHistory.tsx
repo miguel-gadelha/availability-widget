@@ -10,6 +10,7 @@ import SprintList, { SprintRow } from "../SprintList/SprintList";
 import DeleteSprintButton from "./actions/DeleteSprintButton";
 import NewSprintButton from "./actions/NewSprintButton";
 import TeamContextProvider from "@/app/context/TeamContext";
+import EditSprintButton from "./actions/EditSprintButton";
 
 const SprintHistory = () => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -81,7 +82,23 @@ const SprintHistory = () => {
     setActiveSprint(sprints[key]);
   };
 
-  const handleEdit = () => {};
+  const handleOnEdit = (sprint: SprintRow) => {
+    setActiveSprint(undefined);
+
+    setSprints((sprints) => {
+      const newSprints = [...sprints];
+
+      const index = newSprints.findIndex(
+        (newSprint) => newSprint.name === sprint.name
+      );
+
+      if (index !== -1) {
+        newSprints[index] = sprint;
+      }
+
+      return newSprints;
+    });
+  };
 
   const handleOnDelete = (key: number) => {
     setSprints((sprints) => {
@@ -116,14 +133,10 @@ const SprintHistory = () => {
             Sprint History
           </h2>
           <div className="control-buttons">
-            <button
-              onClick={handleEdit}
-              disabled={!activeSprint}
-              className={"mr-2 text-slate-900 disabled:text-slate-400"}
-            >
-              <Edit></Edit>
-            </button>
-
+            <EditSprintButton
+              sprintToEdit={activeSprint}
+              onSprintEdit={handleOnEdit}
+            />
             <DeleteSprintButton
               sprintToDelete={activeSprint}
               onDelete={handleOnDelete}

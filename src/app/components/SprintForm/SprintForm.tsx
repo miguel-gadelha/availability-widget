@@ -120,7 +120,7 @@ const SprintForm = ({
         type="text"
         placeholder="Add your sprint name"
         label="Sprint Name"
-        value={sprint.name}
+        value={decodeURI(sprint.name)}
         onInputChange={handleNameChange}
       ></Input>
       <Input

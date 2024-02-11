@@ -1,4 +1,5 @@
 import { MemberVacations } from "@/types";
+import { useEffect } from "react";
 
 interface Props {
   daysOut: MemberVacations[];
@@ -18,8 +19,6 @@ const DaysOutInput = ({ daysOut, label, onInputChange }: Props) => {
     }
 
     onInputChange(newState);
-
-    return newState;
   };
 
   return (
@@ -46,6 +45,7 @@ const DaysOutInput = ({ daysOut, label, onInputChange }: Props) => {
                 <input
                   className="rounded-md bg-white border border-gray-300 p-3 w-36"
                   type="number"
+                  value={member.days || ""}
                   min={0}
                   max={365}
                   step={5}
