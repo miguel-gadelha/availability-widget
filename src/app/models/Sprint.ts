@@ -55,12 +55,14 @@ export class SprintHandler {
       const result = await db.getCollection("sprints").updateOne(
         { name, teamId },
         {
-          settings,
-          availability,
+          $set: {
+            ...settings,
+            availability,
+          },
         }
       );
 
-      return result;
+      return { result, availability };
     } finally {
       await db.close();
     }
