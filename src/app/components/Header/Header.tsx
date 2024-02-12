@@ -25,7 +25,7 @@ const Header = ({ className }: Props) => {
           {context.name}
         </h1>
         <nav className="flex">
-          <SmallButton className="mr-6">
+          <SmallButton className="mr-6" disabled>
             <UserCog width={16} height={16} />
           </SmallButton>
 
