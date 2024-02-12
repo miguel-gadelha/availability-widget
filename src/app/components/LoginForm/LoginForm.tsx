@@ -17,6 +17,7 @@ const GENERIC_ERROR =
 
 const LoginForm = () => {
   const [invalidMessage, setInvalidMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,6 +61,8 @@ const LoginForm = () => {
       return;
     }
 
+    setIsLoading(true);
+
     const request_body = {
       email,
       password,
@@ -79,6 +82,8 @@ const LoginForm = () => {
           setInvalidMessage(GENERIC_ERROR);
           return;
         }
+
+        setIsLoading(false);
 
         router.push("/manage");
       })
@@ -109,7 +114,12 @@ const LoginForm = () => {
         onInputChange={handlePasswordChange}
       ></Input>
 
-      <Button type="button" className="w-full" onClick={handleSubmit}>
+      <Button
+        type="button"
+        className="w-full"
+        onClick={handleSubmit}
+        isLoading={isLoading}
+      >
         Login
       </Button>
 

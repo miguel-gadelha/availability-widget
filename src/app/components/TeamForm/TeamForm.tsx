@@ -9,6 +9,13 @@ import { useState } from "react";
 import Validator from "@/app/lib/utils/validator";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/Tooltip";
+import { Info } from "lucide-react";
 
 const NAME_ERROR = "Your team needs a name with at least 3 characters. ";
 const EMAIL_ERROR = "You need to provide a valid email. ";
@@ -31,7 +38,12 @@ const TeamForm = () => {
   const [invalidPassword, setInvalidPassword] = useState(true);
   const [invalidTeam, setInvalidTeam] = useState(true);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
+
+  const passwordRules =
+    "Password must contain at least one number, one lowercase and one uppercase letter, and be at least eight characters long.";
 
   const handleTeamNameChange = (value: string) => {
     setInvalidMessage("");
@@ -102,6 +114,8 @@ const TeamForm = () => {
       return;
     }
 
+    setIsLoading(true);
+
     const request_body = {
       name: teamName,
       email,
@@ -122,6 +136,8 @@ const TeamForm = () => {
           setInvalidMessage(GENERIC_ERROR);
           return;
         }
+
+        setIsLoading(false);
 
         router.push("/auth/login");
       })
@@ -159,7 +175,9 @@ const TeamForm = () => {
         placeholder="Add your password"
         label="Password"
         onInputChange={handlePasswordChange}
+        tooltip={passwordRules}
       ></Input>
+
       <MultipleTagInput
         label="Team Members"
         placeholder="Insert names separated by a comma ( , )"
@@ -167,7 +185,12 @@ const TeamForm = () => {
         onTagsChange={handleTeamMembersChange}
       ></MultipleTagInput>
 
-      <Button type="button" className="w-full" onClick={handleSubmit}>
+      <Button
+        type="button"
+        className="w-full"
+        onClick={handleSubmit}
+        isLoading={isLoading}
+      >
         Sign Up
       </Button>
 
