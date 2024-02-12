@@ -7,15 +7,7 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useState } from "react";
 import Validator from "@/app/lib/utils/validator";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/Tooltip";
-import { Info } from "lucide-react";
+import { TeamSettings } from "@/app/models/Team";
 
 const NAME_ERROR = "Your team needs a name with at least 3 characters. ";
 const EMAIL_ERROR = "You need to provide a valid email. ";
@@ -25,22 +17,31 @@ const TEAM_ERROR = "Teams need to have at least one member. ";
 const GENERIC_ERROR =
   "Something went wrong with your sign in. Please try again in a few seconds";
 
-const TeamForm = () => {
-  const [invalidMessage, setInvalidMessage] = useState("");
+interface Props {
+  title: string;
+  team: TeamWithPassword;
+  isLoading?: boolean;
+  onInputChange: (team: TeamWithPassword) => void;
+  onSubmit: () => void;
+}
 
-  const [teamName, setTeamName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [teamMembers, setTeamMembers] = useState<string[]>([]);
+export interface TeamWithPassword extends TeamSettings {
+  password: string;
+}
+
+const TeamForm = ({
+  team,
+  onInputChange,
+  onSubmit,
+  isLoading,
+  title,
+}: Props) => {
+  const [invalidMessage, setInvalidMessage] = useState("");
 
   const [invalidName, setInvalidName] = useState(true);
   const [invalidEmail, setInvalidEmail] = useState(true);
   const [invalidPassword, setInvalidPassword] = useState(true);
   const [invalidTeam, setInvalidTeam] = useState(true);
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter();
 
   const passwordRules =
     "Password must contain at least one number, one lowercase and one uppercase letter, and be at least eight characters long.";
@@ -52,8 +53,12 @@ const TeamForm = () => {
       setInvalidName(true);
     } else {
       setInvalidName(false);
-      setTeamName(value);
     }
+
+    onInputChange({
+      ...team,
+      name: value,
+    });
   };
 
   const handleEmailChange = (value: string) => {
@@ -63,8 +68,12 @@ const TeamForm = () => {
       setInvalidEmail(true);
     } else {
       setInvalidEmail(false);
-      setEmail(value);
     }
+
+    onInputChange({
+      ...team,
+      email: value,
+    });
   };
 
   const handlePasswordChange = (value: string) => {
@@ -74,8 +83,12 @@ const TeamForm = () => {
       setInvalidPassword(true);
     } else {
       setInvalidPassword(false);
-      setPassword(value);
     }
+
+    onInputChange({
+      ...team,
+      password: value,
+    });
   };
 
   const handleTeamMembersChange = (tags: string[]) => {
@@ -85,8 +98,12 @@ const TeamForm = () => {
       setInvalidTeam(true);
     } else {
       setInvalidTeam(false);
-      setTeamMembers(tags);
     }
+
+    onInputChange({
+      ...team,
+      teamMembers: tags,
+    });
   };
 
   const handleSubmit = () => {
@@ -114,45 +131,15 @@ const TeamForm = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    const request_body = {
-      name: teamName,
-      email,
-      password,
-      teamMembers,
-    };
-
-    axios
-      .post("/api/team/create", request_body, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        if (response.status !== 201) {
-          console.error(response);
-          setInvalidMessage(GENERIC_ERROR);
-          return;
-        }
-
-        setIsLoading(false);
-
-        router.push("/auth/login");
-      })
-      .catch((error) => {
-        console.error(error);
-        setInvalidMessage(GENERIC_ERROR);
-      });
+    onSubmit();
   };
   return (
     <Card className="team-form w-96">
       <h3 className="text-slate-900 text-lg leading-7 font-bold mb-2">
-        Sign up
+        {title}
       </h3>
       <p className="text-sm leading-5 text-slate-500 mb-5">
-        Add your team details. This information can be changed later on
+        Add your team details.
       </p>
 
       <Input

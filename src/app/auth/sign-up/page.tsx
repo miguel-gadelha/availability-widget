@@ -1,5 +1,5 @@
-import TeamForm from "@/app/components/TeamForm/TeamForm";
+import CreateTeam from "@/app/components/CreateTeam/CreateTeam";
 
 export default function Page() {
-  return <TeamForm></TeamForm>;
+  return <CreateTeam />;
 }
