@@ -166,6 +166,7 @@ const TeamForm = ({
       ></Input>
 
       <MultipleTagInput
+        tags={team.teamMembers}
         label="Team Members"
         placeholder="Insert names separated by a comma ( , )"
         className={`mb-4 ${invalidTeam ? "border-red-500" : ""}`}

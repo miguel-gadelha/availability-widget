@@ -1,25 +1,30 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Tag from "../Tag/Tag";
 
 interface Props {
+  tags: string[];
   className: string;
   label?: string;
   placeholder?: string;
-  onTagsChange?: (tags: string[]) => void; // Optional prop for the callback
+  onTagsChange: (tags: string[]) => void;
 }
 
-const MultipleTagInput = (props: Props) => {
+const MultipleTagInput = ({
+  tags,
+  className,
+  label,
+  placeholder,
+  onTagsChange,
+}: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [tags, setTags] = useState<string[]>([]);
 
   const handleTagDismiss = (index: number) => {
-    setTags((tags) => {
-      const newTags = [...tags];
-      newTags.splice(index, 1);
-      return newTags;
-    });
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+
+    onTagsChange(newTags);
   };
 
   const handleInput = () => {
@@ -27,12 +32,7 @@ const MultipleTagInput = (props: Props) => {
 
     if (inputValue?.includes(",")) {
       if (inputValue.length > 1) {
-        setTags((tags: string[]) => {
-          const newState = [...tags, inputValue.slice(0, -1)];
-          props.onTagsChange?.(newState);
-
-          return newState;
-        });
+        onTagsChange([...tags, inputValue.slice(0, -1)]);
       }
 
       if (inputRef.current) {
@@ -42,13 +42,13 @@ const MultipleTagInput = (props: Props) => {
   };
 
   return (
-    <div className={`multiple-tag-input ${props.className}`}>
-      {props.label && (
+    <div className={`multiple-tag-input ${className}`}>
+      {label && (
         <label
           id="multiple-tag-label"
           className="text-sm font-medium leading-none block mb-2"
         >
-          {props.label}
+          {label}
         </label>
       )}
 
@@ -74,7 +74,7 @@ const MultipleTagInput = (props: Props) => {
             ref={inputRef}
             type="text"
             onInput={handleInput}
-            placeholder={tags.length === 0 ? props.placeholder : undefined}
+            placeholder={tags.length === 0 ? placeholder : undefined}
           />
         </div>
       </div>
