@@ -5,7 +5,7 @@ import Validator from "../lib/utils/validator";
 import { ObjectId } from "mongodb";
 
 export interface TeamSettings {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
   teamMembers: string[];
@@ -50,7 +50,7 @@ export class Team {
       emailNotUnique = await db
         .getCollection("team")
         .findOne({ email: this.email });
-    } finally {
+    } catch {
       await db.close();
     }
 
@@ -65,9 +65,8 @@ export class Team {
       );
       this.password = hashedPassword;
     } catch (error) {
-      throw new Error(`Failed to hash the password: ${error}`);
-    } finally {
       await db.close();
+      throw new Error(`Failed to hash the password: ${error}`);
     }
 
     try {
