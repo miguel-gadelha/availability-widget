@@ -1,4 +1,6 @@
-This is a simple NextJs project that served mostly as an excercise. Hopefully people will find it helpfull to create simple widgets that mesure availability and include them in sprint reviews.
+This is a simple NextJs project that served mostly as an excercise. Hopefully people will find it helpfull to create simple widgets that measure availability and can be included in sprint reviews.
+
+You can find the project hosted [here](https://availability-widget.vercel.app/)
 
 Feel free to open an PR if you found something that can be improved or changed. I'll try to find the time to implement a couple of the missing features like:
 
