@@ -7,7 +7,12 @@ export async function POST(req: NextRequest) {
   return await withAuth(req, async (team: TeamSettings) => {
     const settings = await req.json();
 
-    if (Object.keys(settings).length < 1 || !settings.name || !team) {
+    if (
+      Object.keys(settings).length < 1 ||
+      !settings.name ||
+      !team ||
+      !team._id
+    ) {
       return NextResponse.json({ error: "Bad Request" }, { status: 400 });
     }
 

@@ -8,7 +8,14 @@ export async function POST(req: NextRequest) {
     const sprintHandler = new SprintHandler();
     const { name, length, members } = await req.json();
 
-    if (!name || !length || !members || members.length < 1 || !team) {
+    if (
+      !name ||
+      !length ||
+      !members ||
+      members.length < 1 ||
+      !team ||
+      !team._id
+    ) {
       return NextResponse.json({ error: "Bad Request" }, { status: 400 });
     }
 

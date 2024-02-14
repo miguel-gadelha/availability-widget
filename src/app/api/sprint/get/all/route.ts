@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const sprints = await SprintHandler.findByTeamId(team._id, skip, limit);
+      const sprints = await SprintHandler.findByTeamId(team._id!, skip, limit);
 
       if (!sprints) {
         return NextResponse.json(
