@@ -1,4 +1,4 @@
-This is a simple NextJs project that served mostly as an excercise. Hopefully people will find it helpfull to create simple widgets that measure availability and can be included in sprint reviews.
+This is a simple NextJs project that served mostly as a way to practice. Hopefully people can still find it helpfull to create simple widgets that measure availability and can be included in sprint reviews.
 
 You can find the project hosted [here](https://availability-widget.vercel.app/)
 
