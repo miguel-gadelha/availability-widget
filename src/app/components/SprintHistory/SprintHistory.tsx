@@ -118,7 +118,7 @@ const SprintHistory = () => {
   };
 
   return (
-    <section className="w-2/3">
+    <section className="w-2/3 pb-12">
       <div className="header w-full mb-11">
         <TeamContextProvider>
           <NewSprintButton

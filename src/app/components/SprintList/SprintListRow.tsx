@@ -52,7 +52,7 @@ const SprintListRow = ({ sprint, className, selected, onSelected }: Prop) => {
           className={className + " flex justify-end"}
           selected={selectedRow}
         >
-          {Number(sprint.availability) + "%"}
+          {sprint.availability!.toFixed(2) + "%"}
         </SprintListCell>
       </div>
     </>

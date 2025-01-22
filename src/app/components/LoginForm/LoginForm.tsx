@@ -88,7 +88,8 @@ const LoginForm = () => {
         router.push("/manage");
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Login error", error);
+        setIsLoading(false);
         setInvalidMessage(GENERIC_ERROR);
       });
   };
