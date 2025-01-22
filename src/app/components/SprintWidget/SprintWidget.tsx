@@ -59,7 +59,7 @@ const SprintWidget = (props: Props) => {
               sprint.availability!
             )}`}
           >
-            {sprint.availability!.toFixed(2) + "%"}
+            {Number(sprint.availability).toFixed(2) + "%"}
           </div>
         </Card>
       )}
