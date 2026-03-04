@@ -4,7 +4,17 @@ import { MongoClient } from "mongodb";
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      {
+        error: "Unauthorized",
+        debug: {
+          receivedHeader: authHeader ? `Bearer <${authHeader.length - 7} chars>` : null,
+          envSecretSet: !!process.env.CRON_SECRET,
+          envSecretLength: process.env.CRON_SECRET?.length ?? 0,
+        },
+      },
+      { status: 401 }
+    );
   }
 
   if (!process.env.MONGODB_CONNECTION_STRING) {
