@@ -26,9 +26,15 @@ export async function GET(request: NextRequest) {
 
   let client: MongoClient | undefined;
   try {
+    const pingedAt = new Date();
     client = await MongoClient.connect(process.env.MONGODB_CONNECTION_STRING);
-    await client.db("sprint_availability").command({ ping: 1 });
-    return NextResponse.json({ ok: true, pingedAt: new Date().toISOString() });
+    const db = client.db("sprint_availability");
+    await db.collection("management").updateOne(
+      { _id: "keep_alive" as unknown as import("mongodb").ObjectId },
+      { $set: { last_ping: pingedAt } },
+      { upsert: true }
+    );
+    return NextResponse.json({ ok: true, pingedAt: pingedAt.toISOString() });
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to ping MongoDB: ${error}` },
